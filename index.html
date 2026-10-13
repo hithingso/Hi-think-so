@@ -19,10 +19,22 @@
 <style>
 body {
 font-family: 'Noto Sans TC', sans-serif;
+background-color: #f8fafc;
 }
-.active-nav {
-color: #3b82f6;
-border-bottom: 2px solid #3b82f6;
+.nav-btn {
+padding: 0.5rem 1rem;
+border-radius: 9999px;
+font-weight: 500;
+transition: all 0.2s ease;
+color: #64748b;
+}
+.nav-btn:hover {
+background-color: #f1f5f9;
+color: #0f172a;
+}
+.nav-btn.active {
+background-color: #e0f2fe;
+color: #0369a1;
 font-weight: 700;
 }
 .pulse-animation {
@@ -30,11 +42,11 @@ animation: pulse 4s infinite ease-in-out;
 }
 @keyframes pulse {
 0%, 100% { transform: scale(1); opacity: 0.9; }
-50% { transform: scale(1.15); opacity: 0.6; }
+50% { transform: scale(1.18); opacity: 0.6; }
 }
 </style>
 
-<!-- Firebase App & Auth SDKs -->
+<!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
@@ -46,14 +58,15 @@ onAuthStateChanged,
 signOut
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ⚠️ 請填入妳專屬的 Firebase 設定資訊
+// 妳專屬的真實 Firebase 設定
 const firebaseConfig = {
-apiKey: "YOUR_API_KEY",
-authDomain: "hithingso.firebaseapp.com",
-projectId: "hithingso",
-storageBucket: "hithingso.appspot.com",
-messagingSenderId: "YOUR_SENDER_ID",
-appId: "YOUR_APP_ID"
+apiKey: "AIzaSyDGWK0D48kx6QVUi2yzSHzx4KqPnj75F3k",
+authDomain: "hi-think-so.firebaseapp.com",
+projectId: "hi-think-so",
+storageBucket: "hi-think-so.firebasestorage.app",
+messagingSenderId: "308449614555",
+appId: "1:308449614555:web:b163a60702928240298afe",
+measurementId: "G-90TPZNFZ40"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -85,34 +98,29 @@ alert('登出失敗：' + error.message);
 }
 };
 
-// 監聽登入狀態變更
 onAuthStateChanged(auth, (user) => {
 const authOverlay = document.getElementById('auth-overlay');
 const userDisplayName = document.getElementById('user-display-name');
 
 if (user) {
 authOverlay.classList.add('hidden');
-if (user.isAnonymous) {
-userDisplayName.textContent = '訪客朋友';
-} else {
-userDisplayName.textContent = user.displayName || '使用者';
-}
+userDisplayName.textContent = user.isAnonymous ? '訪客朋友' : (user.displayName || '使用者');
 } else {
 authOverlay.classList.remove('hidden');
 }
 });
 </script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
 
-<!-- 1. 全螢幕登入彈窗 Overlay -->
+<!-- 全螢幕登入遮罩 -->
 <div id="auth-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-slate-100">
-<div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+<div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
 🍵
 </div>
 <h2 class="text-2xl font-bold text-slate-800 mb-2">嗨！請說</h2>
-<p class="text-slate-500 text-sm mb-6">青年心理健康與支持平台<br>請選擇登入方式開始溫暖陪伴</p>
+<p class="text-slate-500 text-sm mb-6">青年心理健康與支持平台<br>請選擇登入方式開始陪伴體驗</p>
 
 <div class="space-y-3">
 <button onclick="window.firebaseAuth.loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium py-3 px-4 rounded-xl shadow-sm transition">
@@ -127,28 +135,28 @@ authOverlay.classList.remove('hidden');
 </div>
 </div>
 
-<!-- 2. 頂部導覽列 Navbar -->
-<header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+<!-- 頂部導覽列 Navbar -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
 <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 <div class="flex items-center gap-2">
 <span class="text-2xl">🍵</span>
 <span class="font-bold text-xl text-slate-800">嗨！請說</span>
 </div>
 
-<!-- 頁籤分頁按鈕 -->
-<nav class="flex items-center gap-6">
-<button onclick="switchTab('meditation')" id="nav-meditation" class="py-2 text-slate-600 hover:text-blue-600 transition active-nav">
-🧘‍♀️ 靜心冥想
-</button>
-<button onclick="switchTab('cloud-sister')" id="nav-cloud-sister" class="py-2 text-slate-600 hover:text-blue-600 transition">
+<!-- 獨立功能按鈕（雲朵姊姊與靜心冥想完全分開） -->
+<nav class="flex items-center gap-2">
+<button onclick="switchTab('cloud-sister')" id="btn-cloud-sister" class="nav-btn active">
 ☁️ 雲朵姊姊
 </button>
-<button onclick="switchTab('diary')" id="nav-diary" class="py-2 text-slate-600 hover:text-blue-600 transition">
+<button onclick="switchTab('meditation')" id="btn-meditation" class="nav-btn">
+🧘‍♀️ 靜心冥想
+</button>
+<button onclick="switchTab('diary')" id="btn-diary" class="nav-btn">
 📅 心情日曆
 </button>
 </nav>
 
-<!-- 用戶資訊區 -->
+<!-- 使用者資訊 -->
 <div class="flex items-center gap-3">
 <span id="user-display-name" class="text-sm font-medium text-slate-600">載入中...</span>
 <button onclick="window.firebaseAuth.logout()" class="text-xs text-slate-400 hover:text-red-500 border border-slate-200 rounded-lg px-2 py-1 transition">
@@ -158,11 +166,148 @@ authOverlay.classList.remove('hidden');
 </div>
 </header>
 
-<!-- 3. 主要內容區域 -->
-<main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
+<!-- 主內容區 -->
+<main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6">
 
-<!-- 頁籤 A：靜心冥想 -->
-<section id="tab-meditation" class="space-y-6">
-<div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-3xl p-8 border border-indigo-100 text-center">
-<h1 class="text-3xl font-bold text-slate
+<!-- 獨立區塊 1：☁️ 雲朵姊姊陪伴 -->
+<section id="page-cloud-sister" class="space-y-6">
+<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[650px]">
+<div class="bg-sky-50 border-b border-sky-100 p-4 flex items-center gap-3">
+<div class="w-10 h-10 bg-sky-200 rounded-full flex items-center justify-center text-xl shadow-sm">☁️</div>
+<div>
+<h2 class="font-bold text-slate-800">雲朵姊姊</h2>
+<p class="text-xs text-sky-600">隨時隨地傾聽妳的心事與情緒</p>
+</div>
+</div>
+
+<div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center text-sm shadow-sm">☁️</div>
+<div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 text-slate-700 max-w-md shadow-sm">
+嗨！我是雲朵姊姊。今天心情怎麼樣呢？不論是開心的事，還是心裡覺得有點累、有壓力，都可以跟我聊聊喔！
+</div>
+</div>
+</div>
+
+<div class="p-4 bg-white border-t border-slate-100 flex gap-2">
+<input type="text" id="chat-input" onkeypress="handleKeyPress(event)" placeholder="輸入想對雲朵姊姊說的話..." class="flex-1 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400">
+<button onclick="sendMessage()" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2 rounded-xl transition font-medium shadow-sm">
+發送
+</button>
+</div>
+</div>
+</section>
+
+<!-- 獨立區塊 2：🧘‍♀️ 靜心冥想 -->
+<section id="page-meditation" class="hidden space-y-6">
+<div class="bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 rounded-3xl p-8 border border-indigo-100 text-center shadow-sm">
+<h1 class="text-3xl font-bold text-slate-800 mb-3">🧘‍♀️ 靜心冥想空間</h1>
+<p class="text-slate-600 max-w-xl mx-auto">深深吸氣、緩緩吐氣。跟著呼吸圈圈調整節奏，讓緊繃的神經放鬆下來。</p>
+
+<!-- 呼吸練習核心動畫 -->
+<div class="my-12 flex flex-col items-center justify-center">
+<div id="breath-circle" class="w-48 h-48 rounded-full bg-sky-300/40 border-4 border-sky-400 flex flex-col items-center justify-center pulse-animation shadow-lg">
+<span id="breath-text" class="text-2xl font-bold text-sky-900">吸氣...</span>
+<span class="text-xs text-sky-700 mt-1">保持放鬆</span>
+</div>
+</div>
+
+<!-- 白噪音與音效播放區 -->
+<div class="mt-8">
+<h3 class="text-sm font-semibold text-slate-500 mb-4">🎵 選擇背景放鬆音效</h3>
+<div class="flex justify-center gap-4 flex-wrap">
+<button onclick="playAmbient('rain')" class="bg-white hover:bg-sky-50 text-slate-700 px-5 py-2.5 rounded-xl shadow-sm border border-slate-200 transition flex items-center gap-2">
+🌧️ 舒緩雨聲
+</button>
+<button onclick="playAmbient('ocean')" class="bg-white hover:bg-sky-50 text-slate-700 px-5 py-2.5 rounded-xl shadow-sm border border-slate-200 transition flex items-center gap-2">
+🌊 寧靜海浪
+</button>
+<button onclick="playAmbient('forest')" class="bg-white hover:bg-sky-50 text-slate-700 px-5 py-2.5 rounded-xl shadow-sm border border-slate-200 transition flex items-center gap-2">
+🌲 森林微風
+</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 獨立區塊 3：📅 心情日曆 -->
+<section id="page-diary" class="hidden space-y-6">
+<div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+<h2 class="text-2xl font-bold text-slate-800 mb-2">📅 心情塗鴉日曆</h2>
+<p class="text-slate-500 text-sm mb-6">記錄每天的真實心情軌跡，留給自己一份溫柔的記憶。</p>
+<div class="p-16 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
+🗓️ 心情日曆記錄模組（可塗鴉與記錄每日心情）
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- JavaScript 切換邏輯 -->
+<script>
+function switchTab(tabName) {
+document.getElementById('page-cloud-sister').classList.add('hidden');
+document.getElementById('page-meditation').classList.add('hidden');
+document.getElementById('page-diary').classList.add('hidden');
+
+document.getElementById('btn-cloud-sister').classList.remove('active');
+document.getElementById('btn-meditation').classList.remove('active');
+document.getElementById('btn-diary').classList.remove('active');
+
+if (tabName === 'cloud-sister') {
+document.getElementById('page-cloud-sister').classList.remove('hidden');
+document.getElementById('btn-cloud-sister').classList.add('active');
+} else if (tabName === 'meditation') {
+document.getElementById('page-meditation').classList.remove('hidden');
+document.getElementById('btn-meditation').classList.add('active');
+} else if (tabName === 'diary') {
+document.getElementById('page-diary').classList.remove('hidden');
+document.getElementById('btn-diary').classList.add('active');
+}
+}
+
+function sendMessage() {
+const input = document.getElementById('chat-input');
+const messagesContainer = document.getElementById('chat-messages');
+const text = input.value.trim();
+
+if (!text) return;
+
+const userMsg = document.createElement('div');
+userMsg.className = 'flex items-start gap-3 justify-end';
+userMsg.innerHTML = `
+<div class="bg-sky-500 text-white rounded-2xl rounded-tr-none p-3.5 max-w-md shadow-sm">
+${text}
+</div>
+`;
+messagesContainer.appendChild(userMsg);
+input.value = '';
+messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+setTimeout(() => {
+const sisterMsg = document.createElement('div');
+sisterMsg.className = 'flex items-start gap-3';
+sisterMsg.innerHTML = `
+<div class="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center text-sm shadow-sm">☁️</div>
+<div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 text-slate-700 max-w-md shadow-sm">
+謝謝你跟我說這些。無論遇到什麼事情，雲朵姊姊都會一直在這裡陪著你喔！
+</div>
+`;
+messagesContainer.appendChild(sisterMsg);
+messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}, 1000);
+}
+
+function handleKeyPress(e) {
+if (e.key === 'Enter') {
+sendMessage();
+}
+}
+
+function playAmbient(type) {
+alert('已開啟 ' + (type === 'rain' ? '舒緩雨聲' : type === 'ocean' ? '寧靜海浪' : '森林微風') + ' 音效');
+}
+</script>
+</body>
+</html>
 
