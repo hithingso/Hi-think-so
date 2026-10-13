@@ -46,7 +46,7 @@ animation: pulse 4s infinite ease-in-out;
 }
 </style>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDKs & Auth -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
@@ -113,7 +113,7 @@ authOverlay.classList.remove('hidden');
 </head>
 <body class="min-h-screen flex flex-col">
 
-<!-- 全螢幕登入遮罩 -->
+<!-- 1. 全螢幕登入遮罩 -->
 <div id="auth-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-slate-100">
 <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
@@ -135,17 +135,20 @@ authOverlay.classList.remove('hidden');
 </div>
 </div>
 
-<!-- 頂部導覽列 Navbar -->
+<!-- 2. 頂部導覽列 Navbar -->
 <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
 <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
 <span class="text-2xl">🍵</span>
 <span class="font-bold text-xl text-slate-800">嗨！請說</span>
 </div>
 
-<!-- 獨立功能按鈕（雲朵姊姊與靜心冥想完全分開） -->
+<!-- 導覽選單（預設首頁） -->
 <nav class="flex items-center gap-2">
-<button onclick="switchTab('cloud-sister')" id="btn-cloud-sister" class="nav-btn active">
+<button onclick="switchTab('home')" id="btn-home" class="nav-btn active">
+🏠 平台首頁
+</button>
+<button onclick="switchTab('cloud-sister')" id="btn-cloud-sister" class="nav-btn">
 ☁️ 雲朵姊姊
 </button>
 <button onclick="switchTab('meditation')" id="btn-meditation" class="nav-btn">
@@ -156,7 +159,7 @@ authOverlay.classList.remove('hidden');
 </button>
 </nav>
 
-<!-- 使用者資訊 -->
+<!-- 用戶資訊與登出 -->
 <div class="flex items-center gap-3">
 <span id="user-display-name" class="text-sm font-medium text-slate-600">載入中...</span>
 <button onclick="window.firebaseAuth.logout()" class="text-xs text-slate-400 hover:text-red-500 border border-slate-200 rounded-lg px-2 py-1 transition">
@@ -166,11 +169,44 @@ authOverlay.classList.remove('hidden');
 </div>
 </header>
 
-<!-- 主內容區 -->
+<!-- 3. 主內容區域 -->
 <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6">
 
-<!-- 獨立區塊 1：☁️ 雲朵姊姊陪伴 -->
-<section id="page-cloud-sister" class="space-y-6">
+<!-- 區塊 A：🏠 平台首頁 -->
+<section id="page-home" class="space-y-6">
+<div class="bg-gradient-to-br from-sky-50 via-indigo-50 to-white rounded-3xl p-8 md:p-12 border border-sky-100 shadow-sm text-center">
+<div class="w-20 h-20 bg-sky-200 text-sky-700 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner">
+🍵
+</div>
+<h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">歡迎來到「嗨！請說」</h1>
+<p class="text-slate-600 max-w-2xl mx-auto text-lg mb-8">
+這是一個屬於青年朋友的溫暖心理支持與陪伴空間。無論你想找人傾聽心事、讓思緒沈澱放鬆，或是記錄每天的心情，這裡隨時為妳敞開。
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto text-left">
+<div onclick="switchTab('cloud-sister')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+<div class="text-3xl mb-3">☁️</div>
+<h3 class="font-bold text-slate-800 group-hover:text-sky-600 transition mb-1">雲朵姊姊陪伴</h3>
+<p class="text-xs text-slate-500">心情有些悶嗎？讓雲朵姊姊隨時傾聽妳的話語。</p>
+</div>
+
+<div onclick="switchTab('meditation')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+<div class="text-3xl mb-3">🧘‍♀️</div>
+<h3 class="font-bold text-slate-800 group-hover:text-indigo-600 transition mb-1">靜心冥想空間</h3>
+<p class="text-xs text-slate-500">自訂 1-60 分鐘冥想與語音引導，找回內心平靜。</p>
+</div>
+
+<div onclick="switchTab('diary')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+<div class="text-3xl mb-3">📅</div>
+<h3 class="font-bold text-slate-800 group-hover:text-emerald-600 transition mb-1">心情日曆紀錄</h3>
+<p class="text-xs text-slate-500">為每一天的真實情緒留下專屬色彩與回憶。</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 區塊 B：☁️ 雲朵姊姊陪伴 -->
+<section id="page-cloud-sister" class="hidden space-y-6">
 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[650px]">
 <div class="bg-sky-50 border-b border-sky-100 p-4 flex items-center gap-3">
 <div class="w-10 h-10 bg-sky-200 rounded-full flex items-center justify-center text-xl shadow-sm">☁️</div>
@@ -198,23 +234,48 @@ authOverlay.classList.remove('hidden');
 </div>
 </section>
 
-<!-- 獨立區塊 2：🧘‍♀️ 靜心冥想 -->
+<!-- 區塊 C：🧘‍♀️ 靜心冥想空間（1-60分鐘設定 + 語音引導） -->
 <section id="page-meditation" class="hidden space-y-6">
 <div class="bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 rounded-3xl p-8 border border-indigo-100 text-center shadow-sm">
 <h1 class="text-3xl font-bold text-slate-800 mb-3">🧘‍♀️ 靜心冥想空間</h1>
-<p class="text-slate-600 max-w-xl mx-auto">深深吸氣、緩緩吐氣。跟著呼吸圈圈調整節奏，讓緊繃的神經放鬆下來。</p>
+<p class="text-slate-600 max-w-xl mx-auto mb-6">自訂 1 至 60 分鐘的練習時間。跟著語音引導與呼吸圈圈，讓身心沉澱放鬆。</p>
 
-<!-- 呼吸練習核心動畫 -->
-<div class="my-12 flex flex-col items-center justify-center">
+<!-- 1-60 分鐘設定 -->
+<div class="flex justify-center items-center gap-3 mb-6">
+<label for="meditation-mins" class="text-sm font-semibold text-slate-600">冥想時間 (1-60 分鐘)：</label>
+<input type="number" id="meditation-mins" min="1" max="60" value="5" class="w-20 border border-slate-300 rounded-xl px-3 py-1.5 text-center text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white shadow-sm">
+<button onclick="applyCustomTime()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-xl text-sm font-medium transition shadow-sm">
+設定時間
+</button>
+</div>
+
+<!-- 語音引導開關 -->
+<div class="mb-6 flex justify-center items-center gap-2">
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" id="voice-toggle" class="sr-only peer" checked>
+<div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+</label>
+<span class="text-sm font-medium text-slate-700">開啟語音引導（真人語音提示吸氣與吐氣）</span>
+</div>
+
+<!-- 呼吸動畫與倒數計時器 -->
+<div class="my-6 flex flex-col items-center justify-center">
 <div id="breath-circle" class="w-48 h-48 rounded-full bg-sky-300/40 border-4 border-sky-400 flex flex-col items-center justify-center pulse-animation shadow-lg">
-<span id="breath-text" class="text-2xl font-bold text-sky-900">吸氣...</span>
-<span class="text-xs text-sky-700 mt-1">保持放鬆</span>
+<span id="breath-text" class="text-2xl font-bold text-sky-900">準備開始</span>
+<span id="timer-display" class="text-sm font-bold text-sky-800 mt-1">05:00</span>
 </div>
 </div>
 
-<!-- 白噪音與音效播放區 -->
-<div class="mt-8">
-<h3 class="text-sm font-semibold text-slate-500 mb-4">🎵 選擇背景放鬆音效</h3>
+<!-- 開始 / 結束按鈕 -->
+<div class="mb-8">
+<button onclick="toggleMeditation()" id="meditation-toggle-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-medium shadow-md transition">
+開始冥想
+</button>
+</div>
+
+<!-- 背景白噪音 -->
+<div class="mt-4 border-t border-indigo-100/60 pt-6">
+<h3 class="text-sm font-semibold text-slate-500 mb-4">🎵 背景放鬆白噪音</h3>
 <div class="flex justify-center gap-4 flex-wrap">
 <button onclick="playAmbient('rain')" class="bg-white hover:bg-sky-50 text-slate-700 px-5 py-2.5 rounded-xl shadow-sm border border-slate-200 transition flex items-center gap-2">
 🌧️ 舒緩雨聲
@@ -230,7 +291,7 @@ authOverlay.classList.remove('hidden');
 </div>
 </section>
 
-<!-- 獨立區塊 3：📅 心情日曆 -->
+<!-- 區塊 D：📅 心情日曆 -->
 <section id="page-diary" class="hidden space-y-6">
 <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
 <h2 class="text-2xl font-bold text-slate-800 mb-2">📅 心情塗鴉日曆</h2>
@@ -243,18 +304,23 @@ authOverlay.classList.remove('hidden');
 
 </main>
 
-<!-- JavaScript 切換邏輯 -->
+<!-- 4. JavaScript 互動與控制邏輯 -->
 <script>
 function switchTab(tabName) {
+document.getElementById('page-home').classList.add('hidden');
 document.getElementById('page-cloud-sister').classList.add('hidden');
 document.getElementById('page-meditation').classList.add('hidden');
 document.getElementById('page-diary').classList.add('hidden');
 
+document.getElementById('btn-home').classList.remove('active');
 document.getElementById('btn-cloud-sister').classList.remove('active');
 document.getElementById('btn-meditation').classList.remove('active');
 document.getElementById('btn-diary').classList.remove('active');
 
-if (tabName === 'cloud-sister') {
+if (tabName === 'home') {
+document.getElementById('page-home').classList.remove('hidden');
+document.getElementById('btn-home').classList.add('active');
+} else if (tabName === 'cloud-sister') {
 document.getElementById('page-cloud-sister').classList.remove('hidden');
 document.getElementById('btn-cloud-sister').classList.add('active');
 } else if (tabName === 'meditation') {
@@ -266,6 +332,103 @@ document.getElementById('btn-diary').classList.add('active');
 }
 }
 
+// 冥想計時與語音引導邏輯
+let totalSeconds = 300;
+let timerInterval = null;
+let breathInterval = null;
+let isMeditating = false;
+
+function applyCustomTime() {
+if (isMeditating) {
+alert('請先停止目前的冥想練習再調整時間喔！');
+return;
+}
+const inputVal = parseInt(document.getElementById('meditation-mins').value);
+if (isNaN(inputVal) || inputVal < 1 || inputVal > 60) {
+alert('請輸入 1 到 60 之間的有效分鐘數！');
+return;
+}
+totalSeconds = inputVal * 60;
+updateTimerDisplay();
+alert('已成功設定冥想時間為 ' + inputVal + ' 分鐘！');
+}
+
+function updateTimerDisplay() {
+const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+const s = (totalSeconds % 60).toString().padStart(2, '0');
+document.getElementById('timer-display').textContent = `${m}:${s}`;
+}
+
+function speakVoice(text) {
+const isVoiceOn = document.getElementById('voice-toggle').checked;
+if (!isVoiceOn) return;
+if ('speechSynthesis' in window) {
+window.speechSynthesis.cancel();
+const utterance = new SpeechSynthesisUtterance(text);
+utterance.lang = 'zh-TW';
+utterance.rate = 0.85;
+window.speechSynthesis.speak(utterance);
+}
+}
+
+function toggleMeditation() {
+const btn = document.getElementById('meditation-toggle-btn');
+if (!isMeditating) {
+isMeditating = true;
+btn.textContent = '結束冥想';
+btn.className = 'bg-rose-500 hover:bg-rose-600 text-white px-8 py-3 rounded-xl font-medium shadow-md transition';
+
+timerInterval = setInterval(() => {
+if (totalSeconds > 0) {
+totalSeconds--;
+updateTimerDisplay();
+} else {
+stopMeditation();
+alert('恭喜完成冥想練習！好好休息了一段時間呢。');
+}
+}, 1000);
+
+let inhaling = true;
+const breathText = document.getElementById('breath-text');
+
+breathText.textContent = '吸氣...';
+speakVoice('請緩緩吸氣');
+
+breathInterval = setInterval(() => {
+inhaling = !inhaling;
+if (inhaling) {
+breathText.textContent = '吸氣...';
+speakVoice('請緩緩吸氣');
+} else {
+breathText.textContent = '吐氣...';
+speakVoice('請慢慢吐氣，放鬆全身');
+}
+}, 4000);
+
+} else {
+stopMeditation();
+}
+}
+
+function stopMeditation() {
+isMeditating = false;
+clearInterval(timerInterval);
+clearInterval(breathInterval);
+if ('speechSynthesis' in window) {
+window.speechSynthesis.cancel();
+}
+
+const btn = document.getElementById('meditation-toggle-btn');
+btn.textContent = '開始冥想';
+btn.className = 'bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-medium shadow-md transition';
+document.getElementById('breath-text').textContent = '準備開始';
+
+const inputVal = parseInt(document.getElementById('meditation-mins').value) || 5;
+totalSeconds = inputVal * 60;
+updateTimerDisplay();
+}
+
+// 雲朵姊姊聊天對話邏輯
 function sendMessage() {
 const input = document.getElementById('chat-input');
 const messagesContainer = document.getElementById('chat-messages');
