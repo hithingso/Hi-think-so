@@ -1,0 +1,5084 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta
+    name="description"
+    content="嗨！請說｜青年心理健康與支持平台"
+  />
+  <meta name="theme-color" content="#fcfaf7" />
+  <title>嗨！請說｜青年心理健康與支持平台</title>
+
+  <!-- Leaflet 地圖 -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg: #fcfaf7;
+      --paper: #fffdf9;
+      --paper-2: #f8f1e8;
+      --text: #4a4036;
+      --muted: #877b70;
+      --accent: #dda15e;
+      --accent-dark: #bd7d39;
+      --accent-light: #f3ddc0;
+      --sage: #9caf88;
+      --sage-light: #e4ecdd;
+      --rose: #d9a4a0;
+      --rose-light: #f3dddd;
+      --blue: #8faec4;
+      --blue-light: #e0ebf2;
+      --yellow: #e8c978;
+      --yellow-light: #f7efd1;
+      --line: #eadfd3;
+      --danger: #b55f5f;
+      --danger-light: #f8e7e7;
+      --shadow: 0 10px 35px rgba(111, 86, 60, 0.08);
+      --shadow-soft: 0 5px 18px rgba(111, 86, 60, 0.06);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(221, 161, 94, 0.09), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(156, 175, 136, 0.09), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "PingFang TC",
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        "Segoe UI",
+        sans-serif;
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(252, 250, 247, 0.88);
+      border-bottom: 1px solid rgba(234, 223, 211, 0.8);
+    }
+
+    .header-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-cloud {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f4ddc1, #f6cfa5);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      box-shadow: var(--shadow-soft);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      font-size: 18px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -3px;
+    }
+
+    .auth-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .auth-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      border-radius: 999px;
+      padding: 7px 11px;
+      box-shadow: var(--shadow-soft);
+      max-width: 220px;
+    }
+
+    .auth-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--accent-light);
+      font-size: 13px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .auth-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .auth-text {
+      min-width: 0;
+    }
+
+    .auth-name {
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auth-kind {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .icon-btn,
+    .small-btn,
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .icon-btn:hover,
+    .small-btn:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .small-btn {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--paper-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .google-btn {
+      background: var(--text);
+      color: #fff;
+    }
+
+    .google-btn:hover {
+      box-shadow: 0 8px 20px rgba(74, 64, 54, 0.15);
+    }
+
+    .site-nav {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .site-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-btn {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: 0.18s ease;
+    }
+
+    .nav-btn.active {
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(74, 64, 54, 0.14);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 70px;
+    }
+
+    .page {
+      display: none;
+      animation: pageIn 0.25s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.75), transparent 25%),
+        linear-gradient(135deg, #fff6e9 0%, #f8efe4 50%, #eef3e9 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 44px 36px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(221, 161, 94, 0.08);
+      right: -70px;
+      top: -80px;
+    }
+
+    .hero::after {
+      content: "☁️";
+      position: absolute;
+      right: 42px;
+      bottom: 22px;
+      font-size: 72px;
+      opacity: 0.42;
+      transform: rotate(-5deg);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent-dark);
+      background: rgba(255,255,255,0.72);
+      padding: 7px 11px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+      line-height: 1.3;
+    }
+
+    .hero h1 {
+      font-size: clamp(31px, 5vw, 52px);
+      margin-bottom: 14px;
+      max-width: 720px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      max-width: 670px;
+      color: var(--muted);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      padding: 12px 17px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .primary-btn {
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(74, 64, 54, 0.13);
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.8);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .danger-btn {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid #efd0d0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 38px 0 18px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 4px;
+      font-size: 26px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-card,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .feature-card {
+      padding: 20px;
+      min-height: 170px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-size: 23px;
+      margin-bottom: 14px;
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+      background: var(--accent-light);
+    }
+
+    .feature-card:nth-child(2) .feature-icon {
+      background: var(--blue-light);
+    }
+
+    .feature-card:nth-child(3) .feature-icon {
+      background: var(--sage-light);
+    }
+
+    .feature-card:nth-child(4) .feature-icon {
+      background: var(--rose-light);
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 7px;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 13px 15px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.75);
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Chat */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .chat-card {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .chat-top {
+      padding: 17px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(90deg, #fffaf2, #fffdf9);
+    }
+
+    .cloud-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cloud-avatar {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f2dac0, #e7c6a5);
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .cloud-title strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .cloud-title span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .chat-messages {
+      min-height: 430px;
+      max-height: 62vh;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(221, 161, 94, 0.05), transparent 28%),
+        #fffcf8;
+    }
+
+    .msg-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: min(82%, 680px);
+      border-radius: 18px;
+      padding: 11px 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 14px;
+      box-shadow: 0 3px 12px rgba(111, 86, 60, 0.04);
+    }
+
+    .bubble.model {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-top-left-radius: 7px;
+    }
+
+    .bubble.user {
+      background: var(--text);
+      color: #fff;
+      border-top-right-radius: 7px;
+    }
+
+    .bubble.typing {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .chat-composer {
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      padding: 13px;
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: end;
+      gap: 9px;
+    }
+
+    .chat-input {
+      resize: none;
+      min-height: 48px;
+      max-height: 140px;
+      flex: 1;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 12px 13px;
+      outline: none;
+      background: #fffefa;
+      color: var(--text);
+    }
+
+    .chat-input:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #d9b485;
+      box-shadow: 0 0 0 3px rgba(221, 161, 94, 0.12);
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .chat-hint {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 7px;
+      padding-left: 2px;
+    }
+
+    .side-info {
+      padding: 18px;
+      position: sticky;
+      top: 126px;
+    }
+
+    .side-info h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .side-info p {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0 0 12px;
+    }
+
+    .mini-points {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mini-point {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      align-items: flex-start;
+    }
+
+    .crisis-box {
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 16px;
+      background: var(--danger-light);
+      border: 1px solid #efd0d0;
+    }
+
+    .crisis-box strong {
+      display: block;
+      color: var(--danger);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .hotline-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .hotline {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(181,95,95,0.16);
+      border-radius: 11px;
+      padding: 8px 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 11px;
+    }
+
+    .hotline strong {
+      font-size: 13px;
+    }
+
+    /* Meditation */
+    .meditation-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 18px;
+    }
+
+    .meditate-card {
+      padding: 20px;
+    }
+
+    .breathing-stage {
+      min-height: 410px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle, rgba(221,161,94,0.08), transparent 37%),
+        #fffaf4;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .breath-orbit {
+      width: min(280px, 58vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px dashed rgba(221,161,94,0.35);
+      display: grid;
+      place-items: center;
+      animation: orbitSpin 24s linear infinite;
+      opacity: 0.8;
+    }
+
+    .breath-core {
+      width: 115px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, #fff3df, transparent 45%),
+        linear-gradient(135deg, #e7c395, #d9a66d);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      box-shadow:
+        0 15px 45px rgba(221,161,94,0.24),
+        inset 0 0 0 1px rgba(255,255,255,0.35);
+      transition: transform 4s ease-in-out;
+      position: relative;
+      z-index: 2;
+    }
+
+    .breath-core.active.inhale {
+      transform: scale(1.33);
+    }
+
+    .breath-core.active.hold {
+      transform: scale(1.33);
+    }
+
+    .breath-core.active.exhale {
+      transform: scale(0.8);
+    }
+
+    .breath-text {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    @keyframes orbitSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .timer-text {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .meditate-controls {
+      margin-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .control-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chip.active {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .range-wrap input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .range-value {
+      width: 55px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--paper-2);
+      border-radius: 10px;
+      padding: 7px 4px;
+    }
+
+    .custom-minutes {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fffefa;
+      border-radius: 13px;
+      padding: 11px 12px;
+      outline: none;
+      color: var(--text);
+    }
+
+    .sound-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      background: var(--paper-2);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .meditate-note {
+      padding: 13px 14px;
+      border-radius: 15px;
+      background: var(--sage-light);
+      color: #657157;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    /* Map */
+    .map-layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .map-controls {
+      padding: 18px;
+      height: fit-content;
+      position: sticky;
+      top: 126px;
+    }
+
+    .form-stack {
+      display: grid;
+      gap: 11px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .select-field {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fffefa;
+      border-radius: 13px;
+      padding: 11px 12px;
+      outline: none;
+      color: var(--text);
+    }
+
+    .input-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .privacy-note {
+      background: var(--sage-light);
+      color: #64715a;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .map-main {
+      min-width: 0;
+    }
+
+    .map-wrap {
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: #eee;
+      box-shadow: var(--shadow-soft);
+    }
+
+    #map {
+      height: 500px;
+      width: 100%;
+    }
+
+    .map-status {
+      padding: 11px 13px;
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .resource-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .resource-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .resource-title {
+      font-weight: 900;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .resource-meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .resource-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+    }
+
+    .resource-actions a {
+      text-decoration: none;
+      background: var(--paper-2);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .empty-state,
+    .loading-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--paper);
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      font-size: 12px;
+    }
+
+    /* Diary */
+    .diary-layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .calendar-card {
+      padding: 18px;
+      position: sticky;
+      top: 126px;
+    }
+
+    .calendar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .calendar-head strong {
+      font-size: 15px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 35px;
+      height: 35px;
+      border-radius: 11px;
+      background: var(--paper-2);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .weekday-row,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .weekday {
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 800;
+      padding: 4px 0;
+    }
+
+    .day-btn {
+      min-height: 46px;
+      border-radius: 12px;
+      background: transparent;
+      position: relative;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px;
+    }
+
+    .day-btn:hover {
+      background: var(--paper-2);
+    }
+
+    .day-btn.other-month {
+      opacity: 0.32;
+    }
+
+    .day-btn.selected {
+      background: var(--text);
+      color: #fff;
+    }
+
+    .day-btn.today:not(.selected) {
+      outline: 2px solid var(--accent-light);
+    }
+
+    .entry-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+    }
+
+    .selected-date {
+      margin-top: 13px;
+      padding: 10px 12px;
+      background: var(--paper-2);
+      border-radius: 13px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .diary-editor {
+      padding: 18px;
+    }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .mood-option input {
+      display: none;
+    }
+
+    .mood-option label {
+      min-height: 79px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .mood-option input:checked + label {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    .mood-emoji {
+      font-size: 24px;
+    }
+
+    .editor-section {
+      margin-top: 18px;
+    }
+
+    .editor-section h3 {
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .diary-textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .draw-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 9px;
+    }
+
+    .palette-title {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 800;
+      margin-right: 3px;
+    }
+
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .swatch {
+      width: 31px;
+      height: 31px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 1px rgba(74,64,54,0.14);
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .swatch.active {
+      box-shadow: 0 0 0 2px var(--text);
+      transform: scale(1.06);
+    }
+
+    .custom-color-area {
+      border: 1px dashed #d7c5af;
+      background: #fffaf3;
+      border-radius: 15px;
+      padding: 11px;
+      margin-top: 11px;
+    }
+
+    .custom-color-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--accent-dark);
+      margin-bottom: 5px;
+    }
+
+    .custom-color-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .custom-color-input {
+      width: 48px;
+      height: 38px;
+      padding: 3px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .color-preview {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(74,64,54,0.12);
+      display: inline-block;
+    }
+
+    .canvas-wrap {
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: #fffdf9;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #drawingCanvas {
+      display: block;
+      width: 100%;
+      height: 390px;
+      background: #fffdf9;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .draw-actions,
+    .diary-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .range-inline {
+      width: 160px;
+    }
+
+    .range-inline input {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .storage-note {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 9px;
+    }
+
+    /* Footer */
+    footer {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 35px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 130px);
+      background: rgba(74,64,54,0.96);
+      color: #fff;
+      padding: 11px 15px;
+      border-radius: 999px;
+      font-size: 12px;
+      z-index: 3000;
+      transition: transform 0.25s ease;
+      max-width: min(88vw, 520px);
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(74,64,54,0.18);
+      pointer-events: none;
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    .disabled {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1000px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .chat-layout,
+      .meditation-grid,
+      .map-layout,
+      .diary-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-info,
+      .map-controls,
+      .calendar-card {
+        position: static;
+      }
+
+      #map {
+        height: 450px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .header-inner {
+        min-height: 68px;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .auth-status {
+        max-width: 120px;
+        padding: 6px 8px;
+      }
+
+      .auth-kind {
+        display: none;
+      }
+
+      .auth-name {
+        max-width: 65px;
+      }
+
+      .google-btn {
+        padding: 8px 10px;
+      }
+
+      main {
+        padding-top: 18px;
+      }
+
+      .hero {
+        padding: 30px 21px;
+      }
+
+      .hero::after {
+        right: 12px;
+        bottom: 12px;
+        font-size: 54px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-messages {
+        min-height: 390px;
+      }
+
+      .bubble {
+        max-width: 88%;
+      }
+
+      .mood-grid {
+        grid-template-columns: repeat(5, minmax(55px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .mood-option label {
+        min-width: 58px;
+      }
+
+      #drawingCanvas {
+        height: 300px;
+      }
+
+      .input-grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      #map {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-cloud">☁️</div>
+        <div>
+          <div class="brand-title">嗨！請說</div>
+          <div class="brand-subtitle">青年心理健康與支持平台</div>
+        </div>
+      </div>
+
+      <div class="auth-area">
+        <div class="auth-status">
+          <div class="auth-avatar" id="authAvatar">☁️</div>
+          <div class="auth-text">
+            <div class="auth-name" id="authName">正在準備…</div>
+            <div class="auth-kind" id="authKind">登入狀態</div>
+          </div>
+        </div>
+        <button class="small-btn google-btn" id="googleLoginBtn" type="button">
+          使用 Google
+        </button>
+        <button class="small-btn" id="logoutBtn" type="button" hidden>
+          登出
+        </button>
+      </div>
+    </div>
+
+    <nav class="site-nav" aria-label="主要導覽">
+      <button class="nav-btn active" data-page="home" type="button">🏠 首頁</button>
+      <button class="nav-btn" data-page="cloud" type="button">☁️ 雲朵姊姊</button>
+      <button class="nav-btn" data-page="meditation" type="button">🫧 冥想</button>
+      <button class="nav-btn" data-page="map" type="button">🗺️ 支持地圖</button>
+      <button class="nav-btn" data-page="diary" type="button">📔 心情日記</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 首頁 -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div class="eyebrow">🌱 給正在努力生活的你</div>
+        <h1>有些話，不一定要一個人吞下去。</h1>
+        <p>
+          「嗨！請說」想成為一個柔軟的小角落。
+          你可以在這裡找人聊聊、喘口氣、記錄今天，
+          也可以慢慢找到真正適合你的支持。
+        </p>
+
+        <div class="hero-actions">
+          <button class="primary-btn" data-go="cloud" type="button">
+            ☁️ 找雲朵姊姊聊聊
+          </button>
+          <button class="secondary-btn" data-go="meditation" type="button">
+            🫧 我想先喘口氣
+          </button>
+          <button class="secondary-btn" data-go="map" type="button">
+            🗺️ 找附近支持
+          </button>
+        </div>
+
+        <div class="notice">
+          這裡提供的是陪伴與資訊，不取代醫療診斷或專業治療。
+          若你正處於立即危險，請優先聯絡 119／110，或尋求身邊可信任的大人、朋友與專業人員。
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>你可以從任何一個地方開始</h2>
+          <p>不用一次把所有事情都整理好。</p>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">☁️</div>
+          <h3>雲朵姊姊</h3>
+          <p>
+            可以自然地聊心情、生活、人際與煩惱。
+            對話會保留最近的上下文，不是每次都從頭開始。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">🫧</div>
+          <h3>冥想與呼吸</h3>
+          <p>
+            用 1～60 分鐘自由安排一段安靜時間，
+            搭配呼吸動畫和簡單環境聲。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <h3>心理支持地圖</h3>
+          <p>
+            不要求 GPS。你自己選縣市、行政區與街道路巷，
+            再搜尋附近可能有的支持資源。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">📔</div>
+          <h3>我的心情日記</h3>
+          <p>
+            寫下今天的感受，也可以直接畫畫。
+            日記資料會依登入帳號分開保存。
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 雲朵姊姊 -->
+    <section class="page" id="page-cloud">
+      <div class="section-head">
+        <div>
+          <h2>☁️ 雲朵姊姊</h2>
+          <p>你不用想好怎麼說，想到哪裡就說到哪裡。</p>
+        </div>
+      </div>
+
+      <div class="chat-layout">
+        <div class="card chat-card">
+          <div class="chat-top">
+            <div class="cloud-title">
+              <div class="cloud-avatar">☁️</div>
+              <div>
+                <strong>雲朵姊姊</strong>
+                <span id="aiStatusText">正在準備陪你聊天…</span>
+              </div>
+            </div>
+
+            <button class="small-btn" id="clearChatBtn" type="button">
+              清除這段對話
+            </button>
+          </div>
+
+          <div class="chat-messages" id="chatMessages"></div>
+
+          <div class="chat-composer">
+            <div class="composer-row">
+              <textarea
+                id="chatInput"
+                class="chat-input"
+                rows="1"
+                maxlength="3000"
+                placeholder="想說什麼都可以，例如：我今天有點累……"
+              ></textarea>
+
+              <button
+                class="send-btn"
+                id="sendChatBtn"
+                type="button"
+                aria-label="送出訊息"
+                title="送出"
+              >
+                ➤
+              </button>
+            </div>
+
+            <div class="chat-hint">
+              Enter 送出・Shift + Enter 換行
+            </div>
+          </div>
+        </div>
+
+        <aside class="card side-info">
+          <h3>🌷 這裡可以聊什麼？</h3>
+          <p>
+            不一定非得是「很嚴重的事情」才可以來。
+            小事、卡住的地方、害怕、委屈、開心，都可以。
+          </p>
+
+          <div class="mini-points">
+            <div class="mini-point">
+              <span>🫶</span>
+              <span>她會依照你前面說的內容接著聊。</span>
+            </div>
+            <div class="mini-point">
+              <span>🌱</span>
+              <span>不替你下診斷，也不假裝自己是醫療人員。</span>
+            </div>
+            <div class="mini-point">
+              <span>💬</span>
+              <span>如果不需要追問，就不會一直逼你回答問題。</span>
+            </div>
+          </div>
+
+          <div class="crisis-box">
+            <strong>如果你現在有立即傷害自己的危險</strong>
+            <div class="hotline-list">
+              <a class="hotline" href="tel:1925">
+                <span>安心專線</span><strong>1925</strong>
+              </a>
+              <a class="hotline" href="tel:1995">
+                <span>生命線</span><strong>1995</strong>
+              </a>
+              <a class="hotline" href="tel:1980">
+                <span>張老師</span><strong>1980</strong>
+              </a>
+              <a class="hotline" href="tel:119">
+                <span>緊急救護</span><strong>119</strong>
+              </a>
+              <a class="hotline" href="tel:110">
+                <span>警察</span><strong>110</strong>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 冥想 -->
+    <section class="page" id="page-meditation">
+      <div class="section-head">
+        <div>
+          <h2>🫧 冥想與呼吸</h2>
+          <p>今天不用變得更厲害，先讓自己慢一點。</p>
+        </div>
+      </div>
+
+      <div class="meditation-grid">
+        <div class="card meditate-card">
+          <div class="breathing-stage">
+            <div class="timer-text" id="meditationTimer">00:00</div>
+
+            <div class="breath-orbit">
+              <div class="breath-core" id="breathCore">
+                <div class="breath-text" id="breathText">
+                  準備好了嗎？
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="meditate-controls">
+            <div class="control-group">
+              <label>冥想時間</label>
+
+              <div class="control-row" id="presetMinutes">
+                <button class="chip active" data-minutes="5" type="button">5 分鐘</button>
+                <button class="chip" data-minutes="10" type="button">10 分鐘</button>
+                <button class="chip" data-minutes="15" type="button">15 分鐘</button>
+                <button class="chip" data-minutes="30" type="button">30 分鐘</button>
+                <button class="chip" data-minutes="60" type="button">60 分鐘</button>
+              </div>
+
+              <div class="custom-minutes" style="margin-top:8px;">
+                <input
+                  class="field"
+                  id="customMinutes"
+                  type="number"
+                  min="1"
+                  max="60"
+                  step="1"
+                  placeholder="或直接輸入 1～60 分鐘"
+                  inputmode="numeric"
+                />
+                <button class="secondary-btn" id="applyCustomMinutes" type="button">
+                  套用
+                </button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>環境聲</label>
+
+              <div class="control-row">
+                <button class="chip active" data-sound="none" type="button">
+                  🤫 安靜
+                </button>
+                <button class="chip" data-sound="rain" type="button">
+                  🌧️ 雨聲
+                </button>
+                <button class="chip" data-sound="ocean" type="button">
+                  🌊 海浪
+                </button>
+                <button class="chip" data-sound="forest" type="button">
+                  🌲 森林
+                </button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>音量</label>
+              <div class="range-wrap">
+                <input
+                  id="soundVolume"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="35"
+                />
+                <div class="range-value" id="soundVolumeValue">35%</div>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <button class="sound-button" id="meditationStartBtn" type="button">
+                <span>🫧 開始冥想</span>
+                <span>Start</span>
+              </button>
+            </div>
+
+            <div class="control-group">
+              <button class="danger-btn" id="meditationStopBtn" type="button">
+                停止冥想
+              </button>
+            </div>
+
+            <div class="meditate-note">
+              小提醒：第一次播放環境聲時，手機瀏覽器可能需要你先點一下「開始冥想」。
+              切換到其他分頁、離開此頁面或將瀏覽器切到背景時，計時與聲音會自動停止。
+            </div>
+          </div>
+        </div>
+
+        <aside class="card meditate-card">
+          <h3>🌿 今天只需要做到一件事</h3>
+          <p style="color: var(--muted); font-size: 13px;">
+            把注意力放回呼吸。
+          </p>
+
+          <div class="mini-points" style="margin-top:16px;">
+            <div class="mini-point">
+              <span>①</span>
+              <span>吸氣時，感覺空氣進來。</span>
+            </div>
+            <div class="mini-point">
+              <span>②</span>
+              <span>停一下，什麼都不用做。</span>
+            </div>
+            <div class="mini-point">
+              <span>③</span>
+              <span>慢慢吐氣，把肩膀放鬆。</span>
+            </div>
+          </div>
+
+          <div class="notice">
+            冥想不是「一定要清空腦袋」。
+            有想法跑進來很正常，注意到了，再把注意力帶回呼吸即可。
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 地圖 -->
+    <section class="page" id="page-map">
+      <div class="section-head">
+        <div>
+          <h2>🗺️ 心理支持地圖</h2>
+          <p>自己選擇位置，不需要提供 GPS。</p>
+        </div>
+      </div>
+
+      <div class="map-layout">
+        <aside class="card map-controls">
+          <div class="form-stack">
+            <div>
+              <label class="form-label" for="regionSelect">① 縣市</label>
+              <select class="select-field" id="regionSelect">
+                <option value="">請選擇縣市</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label" for="districtSelect">② 行政區</label>
+              <select class="select-field" id="districtSelect" disabled>
+                <option value="">請先選擇縣市</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label" for="roadInput">③ 路／街（選填）</label>
+              <input
+                class="field"
+                id="roadInput"
+                type="text"
+                placeholder="例如：中山路、文化街"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="input-grid-2">
+              <div>
+                <label class="form-label" for="laneInput">④ 巷／弄（選填）</label>
+                <input
+                  class="field"
+                  id="laneInput"
+                  type="text"
+                  placeholder="例如：10巷"
+                  autocomplete="off"
+                />
+              </div>
+
+              <div>
+                <label class="form-label" for="numberInput">⑤ 門牌（選填）</label>
+                <input
+                  class="field"
+                  id="numberInput"
+                  type="text"
+                  placeholder="例如：5號"
+                  autocomplete="off"
+                  inputmode="text"
+                />
+              </div>
+            </div>
+
+            <button class="primary-btn" id="mapSearchBtn" type="button">
+              🔎 搜尋附近支持資源
+            </button>
+
+            <button class="secondary-btn" id="mapGoogleFallbackBtn" type="button">
+              🧭 用 Google Maps 搜尋
+            </button>
+
+            <div class="privacy-note">
+              🔒 <strong>隱私提醒：</strong>
+              這裡不會使用
+              <code>navigator.geolocation</code>，
+              也不會請你開啟 GPS。
+              你填寫的位置只會拿來進行這次地圖搜尋，不會寫入網站的 localStorage。
+            </div>
+          </div>
+
+          <div class="notice">
+            地圖資料來自公開地圖服務。
+            搜尋結果可能因公開資料完整度、服務繁忙或 API 限制而有所不同。
+          </div>
+        </aside>
+
+        <div class="map-main">
+          <div class="map-wrap">
+            <div id="map"></div>
+            <div class="map-status" id="mapStatus">
+              請先從左側選擇縣市與行政區。
+            </div>
+          </div>
+
+          <div class="resource-list" id="resourceList">
+            <div class="empty-state">
+              搜尋後，附近的心理／身心支持資源會出現在這裡。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 日記 -->
+    <section class="page" id="page-diary">
+      <div class="section-head">
+        <div>
+          <h2>📔 我的心情日記</h2>
+          <p>不一定要寫得漂亮，真實就很好。</p>
+        </div>
+      </div>
+
+      <div class="diary-layout">
+        <aside class="card calendar-card">
+          <div class="calendar-head">
+            <strong id="calendarTitle">2026 年 10 月</strong>
+            <div class="calendar-nav">
+              <button class="icon-btn" id="prevMonthBtn" type="button" aria-label="上個月">‹</button>
+              <button class="icon-btn" id="nextMonthBtn" type="button" aria-label="下個月">›</button>
+            </div>
+          </div>
+
+          <div class="weekday-row">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+          </div>
+
+          <div class="calendar-grid" id="calendarGrid"></div>
+
+          <div class="selected-date" id="selectedDateText">
+            今天
+          </div>
+
+          <div class="notice">
+            📌 每個帳號的日記彼此分開保存。
+            目前使用 localStorage 保存，不會自動同步到其他裝置。
+          </div>
+        </aside>
+
+        <div class="card diary-editor">
+          <div>
+            <label class="form-label">今天的心情</label>
+
+            <div class="mood-grid">
+              <div class="mood-option">
+                <input type="radio" id="mood-sunny" name="mood" value="晴朗" />
+                <label for="mood-sunny">
+                  <span class="mood-emoji">☀️</span>
+                  <span>晴朗</span>
+                </label>
+              </div>
+
+              <div class="mood-option">
+                <input type="radio" id="mood-calm" name="mood" value="平靜" />
+                <label for="mood-calm">
+                  <span class="mood-emoji">🌿</span>
+                  <span>平靜</span>
+                </label>
+              </div>
+
+              <div class="mood-option">
+                <input type="radio" id="mood-cloudy" name="mood" value="陰天" />
+                <label for="mood-cloudy">
+                  <span class="mood-emoji">☁️</span>
+                  <span>陰天</span>
+                </label>
+              </div>
+
+              <div class="mood-option">
+                <input type="radio" id="mood-rain" name="mood" value="雨天" />
+                <label for="mood-rain">
+                  <span class="mood-emoji">🌧️</span>
+                  <span>雨天</span>
+                </label>
+              </div>
+
+              <div class="mood-option">
+                <input type="radio" id="mood-anxious" name="mood" value="焦慮" />
+                <label for="mood-anxious">
+                  <span class="mood-emoji">🌪️</span>
+                  <span>焦慮</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-section">
+            <h3>✏️ 今天想寫什麼？</h3>
+            <textarea
+              id="diaryText"
+              class="field diary-textarea"
+              maxlength="10000"
+              placeholder="可以記一件讓你開心的事、一個不想忘記的念頭，或只是：今天真的好累。"
+            ></textarea>
+          </div>
+
+          <div class="editor-section">
+            <h3>🎨 畫一點什麼</h3>
+
+            <div class="draw-toolbar">
+              <span class="palette-title">內建色票</span>
+
+              <div class="palette" id="builtInPalette">
+                <button class="swatch active" type="button" data-color="#4a4036" style="background:#4a4036;" aria-label="深咖啡"></button>
+                <button class="swatch" type="button" data-color="#dda15e" style="background:#dda15e;" aria-label="暖橘"></button>
+                <button class="swatch" type="button" data-color="#d9a4a0" style="background:#d9a4a0;" aria-label="霧粉"></button>
+                <button class="swatch" type="button" data-color="#8faec4" style="background:#8faec4;" aria-label="霧藍"></button>
+                <button class="swatch" type="button" data-color="#9caf88" style="background:#9caf88;" aria-label="鼠尾草綠"></button>
+                <button class="swatch" type="button" data-color="#e8c978" style="background:#e8c978;" aria-label="奶油黃"></button>
+                <button class="swatch" type="button" data-color="#b48ead" style="background:#b48ead;" aria-label="淡紫"></button>
+                <button class="swatch" type="button" data-color="#8aa6a3" style="background:#8aa6a3;" aria-label="灰綠"></button>
+                <button class="swatch" type="button" data-color="#c97d60" style="background:#c97d60;" aria-label="磚紅"></button>
+              </div>
+            </div>
+
+            <div class="custom-color-area">
+              <div class="custom-color-title">
+                🎨 我的自訂顏色
+              </div>
+
+              <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">
+                這一區和上面的「內建色票」是分開的，可以自己選任何顏色。
+              </div>
+
+              <div class="custom-color-row">
+                <input
+                  id="customColorInput"
+                  class="custom-color-input"
+                  type="color"
+                  value="#6f8f83"
+                  aria-label="選擇自訂顏色"
+                />
+
+                <span
+                  class="color-preview"
+                  id="customColorPreview"
+                  style="background:#6f8f83;"
+                ></span>
+
+                <button class="secondary-btn" id="useCustomColorBtn" type="button">
+                  使用這個顏色
+                </button>
+              </div>
+            </div>
+
+            <div class="draw-toolbar" style="margin-top:12px;">
+              <span class="palette-title">筆刷大小</span>
+              <div class="range-inline">
+                <input
+                  id="brushSize"
+                  type="range"
+                  min="1"
+                  max="22"
+                  value="4"
+                />
+              </div>
+
+              <span
+                id="brushSizeValue"
+                style="font-size:10px;color:var(--muted);"
+              >4 px</span>
+            </div>
+
+            <div class="canvas-wrap">
+              <canvas id="drawingCanvas"></canvas>
+            </div>
+
+            <div class="draw-actions">
+              <button class="secondary-btn" id="clearCanvasBtn" type="button">
+                清除畫布
+              </button>
+
+              <button class="secondary-btn" id="saveDrawingBtn" type="button">
+                保存畫畫
+              </button>
+            </div>
+          </div>
+
+          <div class="diary-actions">
+            <button class="primary-btn" id="saveDiaryBtn" type="button">
+              💾 保存今天的日記
+            </button>
+
+            <button class="danger-btn" id="deleteDiaryBtn" type="button">
+              刪除這一天
+            </button>
+          </div>
+
+          <div class="storage-note">
+            日記會按照 Firebase 登入帳號分開保存；圖片採取縮小後的 JPEG 存在 localStorage。
+            若瀏覽器儲存空間不足，網站會提示你，而不會直接讓整頁壞掉。
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    嗨！請說｜青年心理健康與支持平台 · 願你今天也有一個可以喘息的地方 🌿
+  </footer>
+
+  <div id="toast" aria-live="polite"></div>
+
+  <!-- Leaflet -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    crossorigin=""
+  ></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      signInAnonymously,
+      onAuthStateChanged,
+      signOut,
+      linkWithPopup,
+      linkWithRedirect
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+    import {
+      getAI,
+      getGenerativeModel,
+      GoogleAIBackend
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-ai.js";
+
+    /* =========================================================
+       Firebase
+       ========================================================= */
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGWK0D48kx6QVUi2yzSHzx4KqPnj75F3k",
+      authDomain: "hi-think-so.firebaseapp.com",
+      projectId: "hi-think-so",
+      storageBucket: "hi-think-so.firebasestorage.app",
+      messagingSenderId: "308449614555",
+      appId: "1:308449614555:web:b163a60702928240298afe",
+      measurementId: "G-90TPZNFZ40"
+    };
+
+    const app = initializeApp(firebaseConfig);
+
+    try {
+      getAnalytics(app);
+    } catch (error) {
+      console.warn("Analytics 初始化略過：", error);
+    }
+
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    let currentUser = null;
+    let aiModel = null;
+    let aiChat = null;
+    let authReady = false;
+
+    const persistenceReady = setPersistence(
+      auth,
+      browserLocalPersistence
+    ).catch((error) => {
+      console.warn("無法設定 Firebase 本機持久登入：", error);
+    });
+
+    /* =========================================================
+       DOM helpers
+       ========================================================= */
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+    const toastEl = $("#toast");
+
+    let toastTimer = null;
+
+    function showToast(message, duration = 2600) {
+      clearTimeout(toastTimer);
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+
+      toastTimer = setTimeout(() => {
+        toastEl.classList.remove("show");
+      }, duration);
+    }
+
+    function escapeText(value) {
+      return typeof value === "string" ? value : "";
+    }
+
+    function safeJsonParse(raw, fallback) {
+      if (!raw) return fallback;
+
+      try {
+        const parsed = JSON.parse(raw);
+        return parsed;
+      } catch (error) {
+        console.warn("JSON 解析失敗：", error);
+        return fallback;
+      }
+    }
+
+    function localGet(key, fallback = null) {
+      try {
+        return localStorage.getItem(key) ?? fallback;
+      } catch (error) {
+        console.warn("localStorage 讀取失敗：", error);
+        return fallback;
+      }
+    }
+
+    function localSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (error) {
+        console.warn("localStorage 寫入失敗：", error);
+        showToast("瀏覽器儲存空間可能不足，這次沒有保存成功。", 3500);
+        return false;
+      }
+    }
+
+    function localRemove(key) {
+      try {
+        localStorage.removeItem(key);
+        return true;
+      } catch (error) {
+        console.warn("localStorage 刪除失敗：", error);
+        return false;
+      }
+    }
+
+    function debounce(fn, delay = 200) {
+      let timer = null;
+
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+      };
+    }
+
+    /* =========================================================
+       導覽
+       ========================================================= */
+
+    const pages = $$(".page");
+    const navButtons = $$(".nav-btn");
+
+    function switchPage(pageName) {
+      const target = document.getElementById(`page-${pageName}`);
+
+      if (!target) return;
+
+      pages.forEach((page) => {
+        page.classList.toggle("active", page === target);
+      });
+
+      navButtons.forEach((button) => {
+        button.classList.toggle(
+          "active",
+          button.dataset.page === pageName
+        );
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      if (pageName === "map") {
+        setTimeout(() => {
+          if (mapInstance) {
+            mapInstance.invalidateSize();
+          }
+        }, 120);
+      }
+
+      if (pageName === "diary") {
+        setTimeout(() => {
+          resizeDrawingCanvas(true);
+        }, 100);
+      }
+
+      if (pageName !== "meditation") {
+        stopMeditation();
+      }
+    }
+
+    navButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        switchPage(button.dataset.page);
+      });
+    });
+
+    $$("[data-go]").forEach((button) => {
+      button.addEventListener("click", () => {
+        switchPage(button.dataset.go);
+      });
+    });
+
+    /* =========================================================
+       Firebase Auth
+       ========================================================= */
+
+    const authAvatar = $("#authAvatar");
+    const authName = $("#authName");
+    const authKind = $("#authKind");
+    const googleLoginBtn = $("#googleLoginBtn");
+    const logoutBtn = $("#logoutBtn");
+
+    function updateAuthUI(user) {
+      currentUser = user;
+
+      if (!user) {
+        authName.textContent = "尚未登入";
+        authKind.textContent = "準備中";
+        authAvatar.textContent = "☁️";
+        googleLoginBtn.hidden = false;
+        logoutBtn.hidden = true;
+        return;
+      }
+
+      const isAnonymous = user.isAnonymous;
+
+      authKind.textContent = isAnonymous ? "訪客模式" : "Google 帳號";
+      authName.textContent =
+        user.displayName ||
+        user.email ||
+        (isAnonymous ? "訪客" : "已登入");
+
+      authAvatar.replaceChildren();
+
+      if (user.photoURL && !isAnonymous) {
+        const img = document.createElement("img");
+        img.src = user.photoURL;
+        img.alt = "";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = () => {
+          authAvatar.textContent = "☁️";
+        };
+        authAvatar.appendChild(img);
+      } else {
+        authAvatar.textContent = isAnonymous ? "🌱" : "☁️";
+      }
+
+      googleLoginBtn.hidden = !isAnonymous;
+      logoutBtn.hidden = isAnonymous;
+    }
+
+    function getGooglePopupFallbackCodes() {
+      return new Set([
+        "auth/popup-blocked",
+        "auth/operation-not-supported-in-this-environment",
+        "auth/web-storage-unsupported"
+      ]);
+    }
+
+    async function signInGoogle() {
+      await persistenceReady;
+
+      if (!authReady) {
+        showToast("登入系統還在準備，請稍等一下。");
+      }
+
+      googleLoginBtn.disabled = true;
+      googleLoginBtn.textContent = "登入中…";
+
+      try {
+        if (auth.currentUser?.isAnonymous) {
+          try {
+            const result = await linkWithPopup(
+              auth.currentUser,
+              googleProvider
+            );
+
+            showToast(
+              `已連結 Google 帳號：${result.user.email || result.user.displayName || "完成"}`
+            );
+            return;
+          } catch (error) {
+            if (error?.code === "auth/credential-already-in-use") {
+              await signInWithPopup(auth, googleProvider);
+              showToast("這個 Google 帳號已有帳戶，已切換到原本的帳戶。");
+              return;
+            }
+
+            if (!getGooglePopupFallbackCodes().has(error?.code)) {
+              throw error;
+            }
+
+            try {
+              await linkWithRedirect(
+                auth.currentUser,
+                googleProvider
+              );
+              return;
+            } catch (redirectError) {
+              if (redirectError?.code === "auth/credential-already-in-use") {
+                await signInWithRedirect(
+                  auth,
+                  googleProvider
+                );
+                return;
+              }
+
+              throw redirectError;
+            }
+          }
+        }
+
+        try {
+          await signInWithPopup(auth, googleProvider);
+        } catch (error) {
+          if (!getGooglePopupFallbackCodes().has(error?.code)) {
+            throw error;
+          }
+
+          await signInWithRedirect(
+            auth,
+            googleProvider
+          );
+        }
+      } catch (error) {
+        console.error("Google 登入失敗：", error);
+
+        const code = error?.code || "";
+
+        if (code === "auth/unauthorized-domain") {
+          showToast(
+            "Firebase 尚未允許目前網站網域，請到 Authentication → Settings → Authorized domains 加入網站網域。",
+            5200
+          );
+        } else if (code === "auth/popup-closed-by-user") {
+          showToast("你關閉了 Google 登入視窗。");
+        } else {
+          showToast("Google 登入沒有完成，請再試一次。");
+        }
+      } finally {
+        googleLoginBtn.disabled = false;
+        googleLoginBtn.textContent = "使用 Google";
+      }
+    }
+
+    async function returnToGuestMode() {
+      try {
+        await signOut(auth);
+        await signInAnonymously(auth);
+        showToast("已回到訪客模式。");
+      } catch (error) {
+        console.error("回訪客模式失敗：", error);
+        showToast("回到訪客模式失敗，請重新整理頁面。");
+      }
+    }
+
+    googleLoginBtn.addEventListener("click", signInGoogle);
+
+    logoutBtn.addEventListener("click", returnToGuestMode);
+
+    onAuthStateChanged(auth, async (user) => {
+      authReady = true;
+
+      if (!user) {
+        try {
+          await signInAnonymously(auth);
+        } catch (error) {
+          console.error("匿名登入失敗：", error);
+          updateAuthUI(null);
+          showToast("訪客模式暫時無法啟用，但你仍可使用部分網站功能。", 4500);
+        }
+        return;
+      }
+
+      updateAuthUI(user);
+      initializeUserFeatures(user);
+    });
+
+    async function handleRedirectResult() {
+      await persistenceReady;
+
+      try {
+        const result = await getRedirectResult(auth);
+
+        if (result?.user) {
+          showToast("Google 登入完成，歡迎回來 🌷");
+        }
+      } catch (error) {
+        console.error("Redirect 結果處理失敗：", error);
+
+        if (error?.code === "auth/credential-already-in-use") {
+          try {
+            await signInWithRedirect(auth, googleProvider);
+            return;
+          } catch (fallbackError) {
+            console.error("Credential already in use fallback 失敗：", fallbackError);
+          }
+        }
+
+        if (error?.code === "auth/unauthorized-domain") {
+          showToast(
+            "這個網站網域尚未加入 Firebase Authorized domains。",
+            5000
+          );
+        }
+      }
+    }
+
+    handleRedirectResult();
+
+    /* =========================================================
+       AI：雲朵姊姊
+       ========================================================= */
+
+    const aiStatusText = $("#aiStatusText");
+    const chatMessages = $("#chatMessages");
+    const chatInput = $("#chatInput");
+    const sendChatBtn = $("#sendChatBtn");
+    const clearChatBtn = $("#clearChatBtn");
+
+    const AI_MODEL_NAME = "gemini-3.5-flash-lite";
+
+    const aiSystemInstruction = `
+你是「雲朵姊姊」，一位溫暖、可靠、自然的中文陪伴型 AI。
+
+你的主要任務是陪伴台灣年輕人談論生活、情緒、人際、學業、工作、自我懷疑、壓力與日常煩惱。
+
+請遵守以下規則：
+
+1. 一律使用繁體中文回覆。
+2. 要真正回答使用者當下說的事情，不要每次都套用固定的「你辛苦了」「一切都會好的」模板。
+3. 要讀取前面的對話脈絡，讓回覆像同一段持續進行的聊天。
+4. 如果使用者只是在分享事情，不一定要問問題。
+5. 一次最多問一個有意義的追問。
+6. 語氣像溫柔但自然的姊姊，不要過度說教，不要過度正式。
+7. 不要宣稱自己是真人，也不要假裝自己是心理師、醫師或其他醫療專業人員。
+8. 不可以下心理疾病診斷、不可以開藥、不可以把自己的回答包裝成正式醫療意見。
+9. 如果使用者有明確的自殺、自傷、準備傷害自己、正在傷害自己、立即危險等內容，首先關注安全，而不是繼續一般聊天。
+10. 在台灣情境下，可提醒 119、110，以及 1925 安心專線、1995 生命線、1980 張老師。
+11. 危機情況時，不要責怪或嚇唬使用者；使用直接、清楚、溫柔的安全語言。
+12. 回覆通常控制在 2～6 個短段落，不需要長篇大論。
+13. 不要每一句都塞 emoji。自然使用即可。
+14. 不要說「身為 AI，我無法……」這類破壞對話感的固定句式，除非真的與能力限制直接相關。
+15. 不要把使用者的話重新完整複述一遍；可以抓重點後自然回應。
+`;
+
+    try {
+      const ai = getAI(app, {
+        backend: new GoogleAIBackend()
+      });
+
+      aiModel = getGenerativeModel(ai, {
+        model: AI_MODEL_NAME,
+        systemInstruction: aiSystemInstruction,
+        generationConfig: {
+          maxOutputTokens: 700,
+          temperature: 0.86
+        }
+      });
+
+      aiStatusText.textContent = "可以開始聊天了。";
+    } catch (error) {
+      console.error("Firebase AI Logic 初始化失敗：", error);
+      aiModel = null;
+      aiStatusText.textContent = "AI 暫時無法啟用，其他功能仍可使用。";
+    }
+
+    function chatStorageKey(uid) {
+      return `cloudSisterHistory:${uid}`;
+    }
+
+    function normalizeHistory(history) {
+      if (!Array.isArray(history)) {
+        return [];
+      }
+
+      const cleaned = history
+        .filter((item) => {
+          return (
+            item &&
+            (item.role === "user" || item.role === "model") &&
+            Array.isArray(item.parts) &&
+            item.parts.length > 0 &&
+            typeof item.parts[0]?.text === "string" &&
+            item.parts[0].text.trim()
+          );
+        })
+        .map((item) => ({
+          role: item.role,
+          parts: [{ text: item.parts[0].text.trim().slice(0, 5000) }]
+        }));
+
+      return cleaned.slice(-40);
+    }
+
+    function loadChatHistory(uid) {
+      if (!uid) return [];
+
+      const raw = localGet(chatStorageKey(uid), "[]");
+      return normalizeHistory(safeJsonParse(raw, []));
+    }
+
+    function saveChatHistory(uid, history) {
+      if (!uid) return;
+
+      const cleaned = normalizeHistory(history);
+      localSet(
+        chatStorageKey(uid),
+        JSON.stringify(cleaned)
+      );
+    }
+
+    let chatHistory = [];
+
+    function createChatForCurrentUser() {
+      chatHistory = currentUser
+        ? loadChatHistory(currentUser.uid)
+        : [];
+
+      if (!aiModel) {
+        aiChat = null;
+        return;
+      }
+
+      try {
+        aiChat = aiModel.startChat({
+          history: chatHistory
+        });
+      } catch (error) {
+        console.error("AI chat 初始化失敗：", error);
+        aiChat = null;
+      }
+    }
+
+    function renderChatHistory() {
+      chatMessages.replaceChildren();
+
+      if (!chatHistory.length) {
+        appendChatMessage(
+          "model",
+          "嗨，我是雲朵姊姊 ☁️\n\n你可以直接跟我說最近發生了什麼，不用先整理得很完整。就算只想說一句「我今天好煩」也可以。"
+        );
+        return;
+      }
+
+      for (const item of chatHistory) {
+        const text = item.parts?.[0]?.text || "";
+        appendChatMessage(item.role, text);
+      }
+    }
+
+    function appendChatMessage(role, text, options = {}) {
+      const row = document.createElement("div");
+      row.className = `msg-row ${role === "user" ? "user" : "model"}`;
+
+      const bubble = document.createElement("div");
+      bubble.className =
+        `bubble ${role === "user" ? "user" : "model"}` +
+        (options.typing ? " typing" : "");
+
+      bubble.textContent = text;
+
+      row.appendChild(bubble);
+      chatMessages.appendChild(row);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      return bubble;
+    }
+
+    function isCrisisLike(text) {
+      const patterns = [
+        "想死",
+        "想要死",
+        "不想活",
+        "不想再活",
+        "自殺",
+        "自残",
+        "自殘",
+        "自傷",
+        "傷害自己",
+        "傷害我自己",
+        "割腕",
+        "跳樓",
+        "輕生",
+        "結束生命",
+        "活不下去",
+        "想消失",
+        "想去死"
+      ];
+
+      return patterns.some((pattern) => text.includes(pattern));
+    }
+
+    function appendCrisisSafetyNote() {
+      const box = document.createElement("div");
+      box.className = "crisis-box";
+      box.style.marginTop = "5px";
+      box.style.alignSelf = "stretch";
+
+      const strong = document.createElement("strong");
+      strong.textContent = "先把安全放在第一位";
+
+      const text = document.createElement("div");
+      text.style.fontSize = "11px";
+      text.style.lineHeight = "1.7";
+      text.style.color = "var(--danger)";
+      text.textContent =
+        "如果你現在可能會傷害自己，先不要獨處，請立刻聯絡 119／110，或打 1925、1995、1980 找到真人支持。";
+
+      const actions = document.createElement("div");
+      actions.className = "hotline-list";
+      actions.style.marginTop = "8px";
+
+      [
+        ["119", "tel:119"],
+        ["110", "tel:110"],
+        ["1925", "tel:1925"],
+        ["1995", "tel:1995"],
+        ["1980", "tel:1980"]
+      ].forEach(([label, href]) => {
+        const a = document.createElement("a");
+        a.className = "hotline";
+        a.href = href;
+        a.innerHTML = "";
+        const left = document.createElement("span");
+        left.textContent = "撥打";
+        const right = document.createElement("strong");
+        right.textContent = label;
+        a.append(left, right);
+        actions.appendChild(a);
+      });
+
+      box.append(strong, text, actions);
+      chatMessages.appendChild(box);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendChatMessage() {
+      const message = chatInput.value.trim();
+
+      if (!message) return;
+
+      if (!currentUser) {
+        showToast("登入系統還沒完成，請稍等一下。");
+        return;
+      }
+
+      if (!aiModel) {
+        showToast("雲朵姊姊目前沒有成功連上 AI，請稍後重新整理頁面。", 4000);
+        return;
+      }
+
+      if (sendChatBtn.disabled) return;
+
+      sendChatBtn.disabled = true;
+      chatInput.disabled = true;
+
+      appendChatMessage("user", message);
+
+      if (isCrisisLike(message)) {
+        appendCrisisSafetyNote();
+      }
+
+      chatInput.value = "";
+      autoResizeChatInput();
+
+      const aiBubble = appendChatMessage(
+        "model",
+        "雲朵姊姊正在想想…",
+        { typing: true }
+      );
+
+      try {
+        if (!aiChat) {
+          createChatForCurrentUser();
+        }
+
+        if (!aiChat) {
+          throw new Error("AI Chat 尚未初始化。");
+        }
+
+        const result = await aiChat.sendMessageStream(message);
+
+        let fullText = "";
+        aiBubble.textContent = "";
+        aiBubble.classList.remove("typing");
+
+        for await (const chunk of result.stream) {
+          const chunkText =
+            typeof chunk?.text === "function"
+              ? chunk.text()
+              : "";
+
+          if (!chunkText) continue;
+
+          fullText += chunkText;
+          aiBubble.textContent = fullText;
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        if (!fullText.trim()) {
+          try {
+            const response = await result.response;
+            const fallbackText =
+              typeof response?.text === "function"
+                ? response.text()
+                : "";
+
+            fullText = fallbackText || "";
+            aiBubble.textContent =
+              fullText || "嗯……我剛剛好像沒有成功說出話，再跟我說一次，好嗎？";
+          } catch (fallbackError) {
+            console.warn("取得 AI 完整回覆失敗：", fallbackError);
+          }
+        }
+
+        if (!fullText.trim()) {
+          fullText = "我剛剛沒有成功收到完整回覆，你可以再試一次。";
+        }
+
+        chatHistory.push(
+          {
+            role: "user",
+            parts: [{ text: message }]
+          },
+          {
+            role: "model",
+            parts: [{ text: fullText }]
+          }
+        );
+
+        chatHistory = normalizeHistory(chatHistory);
+        saveChatHistory(currentUser.uid, chatHistory);
+      } catch (error) {
+        console.error("AI 回覆失敗：", error);
+
+        aiBubble.classList.remove("typing");
+        aiBubble.textContent =
+          "我剛剛跟 AI 連線時卡住了 😭\n你可以再送一次，我會重新接住這段對話。";
+
+        /*
+          如果本次請求已經進入 SDK 的 chat state，
+          就重建 chat，避免下一次訊息帶著不完整的狀態繼續。
+        */
+        createChatForCurrentUser();
+
+        const code = error?.code || "";
+
+        if (code.includes("permission") || code.includes("app-check")) {
+          showToast(
+            "Firebase AI Logic 拒絕了這次請求，請檢查 Firebase AI Logic / App Check 設定。",
+            4500
+          );
+        } else {
+          showToast(
+            "雲朵姊姊暫時沒有回應成功，請稍後再試。",
+            3500
+          );
+        }
+      } finally {
+        sendChatBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    function clearChat() {
+      if (!currentUser) return;
+
+      const key = chatStorageKey(currentUser.uid);
+      localRemove(key);
+
+      chatHistory = [];
+
+      if (aiModel) {
+        try {
+          aiChat = aiModel.startChat({
+            history: []
+          });
+        } catch (error) {
+          console.warn("重新初始化 AI chat 失敗：", error);
+          aiChat = null;
+        }
+      }
+
+      renderChatHistory();
+      showToast("這段對話已清除。");
+    }
+
+    function autoResizeChatInput() {
+      chatInput.style.height = "auto";
+      chatInput.style.height =
+        Math.min(chatInput.scrollHeight, 140) + "px";
+    }
+
+    chatInput.addEventListener("input", autoResizeChatInput);
+
+    chatInput.addEventListener("keydown", (event) => {
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    sendChatBtn.addEventListener("click", sendChatMessage);
+    clearChatBtn.addEventListener("click", clearChat);
+
+    /* =========================================================
+       冥想：Web Audio + 計時器
+       ========================================================= */
+
+    let audioContext = null;
+    let masterGain = null;
+    let noiseSource = null;
+    let audioNodes = [];
+    let meditationTimerId = null;
+    let meditationEndAt = 0;
+    let meditationRunning = false;
+    let selectedMeditationMinutes = 5;
+    let selectedSound = "none";
+    let selectedVolume = 0.35;
+
+    let breathTimeouts = [];
+
+    const meditationTimerEl = $("#meditationTimer");
+    const breathCore = $("#breathCore");
+    const breathText = $("#breathText");
+    const meditationStartBtn = $("#meditationStartBtn");
+    const meditationStopBtn = $("#meditationStopBtn");
+    const soundVolume = $("#soundVolume");
+    const soundVolumeValue = $("#soundVolumeValue");
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        const AudioCtx =
+          window.AudioContext ||
+          window.webkitAudioContext;
+
+        if (!AudioCtx) {
+          throw new Error("此瀏覽器不支援 Web Audio API。");
+        }
+
+        audioContext = new AudioCtx();
+
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = selectedVolume;
+        masterGain.connect(audioContext.destination);
+      }
+
+      if (audioContext.state === "suspended") {
+        return audioContext.resume();
+      }
+
+      return Promise.resolve();
+    }
+
+    function cleanupAudioNodes() {
+      for (const node of audioNodes) {
+        try {
+          if (typeof node.stop === "function") {
+            node.stop();
+          }
+        } catch (_) {}
+
+        try {
+          if (typeof node.disconnect === "function") {
+            node.disconnect();
+          }
+        } catch (_) {}
+      }
+
+      audioNodes = [];
+    }
+
+    function createNoiseBuffer(ctx, seconds = 2) {
+      const frameCount = Math.floor(
+        ctx.sampleRate * seconds
+      );
+
+      const buffer = ctx.createBuffer(
+        1,
+        frameCount,
+        ctx.sampleRate
+      );
+
+      const data = buffer.getChannelData(0);
+
+      let last = 0;
+
+      for (let i = 0; i < frameCount; i++) {
+        const white = Math.random() * 2 - 1;
+
+        /*
+          簡單的平滑噪音，
+          比純白噪音更適合拿來做環境聲底。
+        */
+        last = last * 0.985 + white * 0.015;
+        data[i] = last * 3.5;
+      }
+
+      return buffer;
+    }
+
+    function startRainSound() {
+      if (!audioContext || !masterGain) return;
+
+      cleanupAudioNodes();
+
+      const source = audioContext.createBufferSource();
+      source.buffer = createNoiseBuffer(audioContext, 3);
+      source.loop = true;
+
+      const highpass = audioContext.createBiquadFilter();
+      highpass.type = "highpass";
+      highpass.frequency.value = 500;
+
+      const lowpass = audioContext.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.value = 8000;
+
+      const gain = audioContext.createGain();
+      gain.gain.value = 0.42;
+
+      source
+        .connect(highpass)
+        .connect(lowpass)
+        .connect(gain)
+        .connect(masterGain);
+
+      source.start();
+
+      audioNodes.push(source);
+    }
+
+    function startOceanSound() {
+      if (!audioContext || !masterGain) return;
+
+      cleanupAudioNodes();
+
+      const source = audioContext.createBufferSource();
+      source.buffer = createNoiseBuffer(audioContext, 4);
+      source.loop = true;
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 1200;
+      filter.Q.value = 0.4;
+
+      const gain = audioContext.createGain();
+      gain.gain.value = 0.65;
+
+      source
+        .connect(filter)
+        .connect(gain)
+        .connect(masterGain);
+
+      source.start();
+
+      audioNodes.push(source);
+
+      /*
+        再加一個很柔和的低頻震盪，
+        讓聲音不要像單純的噪音。
+      */
+      const oscillator = audioContext.createOscillator();
+      const oscGain = audioContext.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = 58;
+      oscGain.gain.value = 0.018;
+
+      oscillator
+        .connect(oscGain)
+        .connect(masterGain);
+
+      oscillator.start();
+
+      audioNodes.push(oscillator);
+    }
+
+    function startForestSound() {
+      if (!audioContext || !masterGain) return;
+
+      cleanupAudioNodes();
+
+      const source = audioContext.createBufferSource();
+      source.buffer = createNoiseBuffer(audioContext, 3.5);
+      source.loop = true;
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = 900;
+      filter.Q.value = 0.7;
+
+      const gain = audioContext.createGain();
+      gain.gain.value = 0.18;
+
+      source
+        .connect(filter)
+        .connect(gain)
+        .connect(masterGain);
+
+      source.start();
+
+      audioNodes.push(source);
+
+      /*
+        非規律的短鳥鳴。
+      */
+      const chirpLoop = setInterval(() => {
+        if (
+          !audioContext ||
+          !meditationRunning ||
+          selectedSound !== "forest"
+        ) {
+          clearInterval(chirpLoop);
+          return;
+        }
+
+        const now = audioContext.currentTime;
+
+        const osc = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        osc.type = "sine";
+
+        const base = 1700 + Math.random() * 1100;
+        osc.frequency.setValueAtTime(base, now);
+        osc.frequency.exponentialRampToValueAtTime(
+          base * 1.32,
+          now + 0.11
+        );
+
+        gainNode.gain.setValueAtTime(0.0001, now);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.018,
+          now + 0.025
+        );
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.0001,
+          now + 0.22
+        );
+
+        osc.connect(gainNode).connect(masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.24);
+      }, 4200 + Math.random() * 2200);
+
+      audioNodes.push({
+        stop() {
+          clearInterval(chirpLoop);
+        }
+      });
+    }
+
+    function startSelectedSound() {
+      if (selectedSound === "rain") {
+        startRainSound();
+      } else if (selectedSound === "ocean") {
+        startOceanSound();
+      } else if (selectedSound === "forest") {
+        startForestSound();
+      } else {
+        cleanupAudioNodes();
+      }
+    }
+
+    function updateMeditationVolume() {
+      selectedVolume =
+        Number(soundVolume.value || 35) / 100;
+
+      soundVolumeValue.textContent =
+        `${Math.round(selectedVolume * 100)}%`;
+
+      if (masterGain && audioContext) {
+        masterGain.gain.setTargetAtTime(
+          selectedVolume,
+          audioContext.currentTime,
+          0.03
+        );
+      }
+    }
+
+    soundVolume.addEventListener(
+      "input",
+      updateMeditationVolume
+    );
+
+    function formatTimer(seconds) {
+      const safe = Math.max(0, Math.floor(seconds));
+      const minutes = Math.floor(safe / 60);
+      const secs = safe % 60;
+
+      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function clearBreathTimeouts() {
+      breathTimeouts.forEach((id) => clearTimeout(id));
+      breathTimeouts = [];
+    }
+
+    function runBreathingCycle() {
+      if (!meditationRunning) return;
+
+      clearBreathTimeouts();
+
+      breathCore.classList.add("active");
+      breathCore.classList.remove("inhale", "hold", "exhale");
+
+      breathText.textContent = "吸氣";
+
+      requestAnimationFrame(() => {
+        breathCore.classList.add("inhale");
+      });
+
+      const holdId = setTimeout(() => {
+        if (!meditationRunning) return;
+
+        breathCore.classList.remove("inhale");
+        breathCore.classList.add("hold");
+        breathText.textContent = "停一下";
+      }, 4000);
+
+      const exhaleId = setTimeout(() => {
+        if (!meditationRunning) return;
+
+        breathCore.classList.remove("hold");
+        breathCore.classList.add("exhale");
+        breathText.textContent = "慢慢吐氣";
+      }, 6500);
+
+      const cycleId = setTimeout(() => {
+        if (!meditationRunning) return;
+        runBreathingCycle();
+      }, 10500);
+
+      breathTimeouts.push(
+        holdId,
+        exhaleId,
+        cycleId
+      );
+    }
+
+    function resetBreathingUI() {
+      clearBreathTimeouts();
+
+      breathCore.classList.remove(
+        "active",
+        "inhale",
+        "hold",
+        "exhale"
+      );
+
+      breathText.textContent = "準備好了嗎？";
+    }
+
+    async function startMeditation() {
+      if (meditationRunning) return;
+
+      try {
+        await ensureAudioContext();
+
+        selectedMeditationMinutes = Math.min(
+          60,
+          Math.max(1, Number(selectedMeditationMinutes) || 5)
+        );
+
+        updateMeditationVolume();
+
+        meditationRunning = true;
+
+        meditationEndAt =
+          Date.now() +
+          selectedMeditationMinutes * 60 * 1000;
+
+        startSelectedSound();
+        runBreathingCycle();
+
+        meditationStartBtn.disabled = true;
+        meditationStartBtn.innerHTML =
+          "<span>🫧 冥想進行中…</span><span>Running</span>";
+
+        updateMeditationTimer();
+
+        meditationTimerId = setInterval(
+          updateMeditationTimer,
+          250
+        );
+      } catch (error) {
+        console.error("冥想啟動失敗：", error);
+        showToast(
+          "無法啟動環境音，可能是瀏覽器不支援 Web Audio。",
+          3800
+        );
+      }
+    }
+
+    function updateMeditationTimer() {
+      if (!meditationRunning) {
+        meditationTimerEl.textContent = "00:00";
+        return;
+      }
+
+      const remaining = Math.max(
+        0,
+        meditationEndAt - Date.now()
+      );
+
+      meditationTimerEl.textContent =
+        formatTimer(Math.ceil(remaining / 1000));
+
+      if (remaining <= 0) {
+        stopMeditation(true);
+      }
+    }
+
+    function stopMeditation(completed = false) {
+      meditationRunning = false;
+
+      if (meditationTimerId) {
+        clearInterval(meditationTimerId);
+        meditationTimerId = null;
+      }
+
+      clearBreathTimeouts();
+      cleanupAudioNodes();
+      resetBreathingUI();
+
+      meditationTimerEl.textContent = "00:00";
+
+      meditationStartBtn.disabled = false;
+      meditationStartBtn.innerHTML =
+        "<span>🫧 開始冥想</span><span>Start</span>";
+
+      if (completed) {
+        showToast("這一段冥想結束了。辛苦你陪自己走完這段時間 🌿", 3500);
+      }
+    }
+
+    meditationStartBtn.addEventListener(
+      "click",
+      startMeditation
+    );
+
+    meditationStopBtn.addEventListener(
+      "click",
+      () => stopMeditation(false)
+    );
+
+    $$("#presetMinutes .chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        const minutes = Number(button.dataset.minutes);
+
+        if (!Number.isFinite(minutes)) return;
+
+        selectedMeditationMinutes = Math.min(
+          60,
+          Math.max(1, minutes)
+        );
+
+        $$("#presetMinutes .chip").forEach((chip) => {
+          chip.classList.toggle(
+            "active",
+            chip === button
+          );
+        });
+
+        $("#customMinutes").value =
+          selectedMeditationMinutes;
+      });
+    });
+
+    $("#applyCustomMinutes").addEventListener(
+      "click",
+      () => {
+        const raw = Number(
+          $("#customMinutes").value
+        );
+
+        if (!Number.isFinite(raw)) {
+          showToast("請輸入 1～60 分鐘。");
+          return;
+        }
+
+        const minutes = Math.min(
+          60,
+          Math.max(1, Math.round(raw))
+        );
+
+        selectedMeditationMinutes = minutes;
+
+        $$("#presetMinutes .chip").forEach((chip) => {
+          chip.classList.remove("active");
+        });
+
+        $("#customMinutes").value = minutes;
+
+        showToast(`已設定為 ${minutes} 分鐘。`);
+      }
+    );
+
+    $$("[data-sound]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        selectedSound = button.dataset.sound;
+
+        $$("[data-sound]").forEach((item) => {
+          item.classList.toggle(
+            "active",
+            item === button
+          );
+        });
+
+        if (meditationRunning) {
+          await ensureAudioContext();
+          startSelectedSound();
+        }
+      });
+    });
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden) {
+          stopMeditation(false);
+        }
+      }
+    );
+
+    window.addEventListener("pagehide", () => {
+      stopMeditation(false);
+    });
+
+    window.addEventListener("beforeunload", () => {
+      stopMeditation(false);
+    });
+
+    /* =========================================================
+       地圖：完全不使用 GPS
+       ========================================================= */
+
+    let mapInstance = null;
+    let searchMarker = null;
+    let searchCircle = null;
+    let resourceMarkers = [];
+
+    const regionSelect = $("#regionSelect");
+    const districtSelect = $("#districtSelect");
+    const roadInput = $("#roadInput");
+    const laneInput = $("#laneInput");
+    const numberInput = $("#numberInput");
+    const mapSearchBtn = $("#mapSearchBtn");
+    const mapGoogleFallbackBtn = $("#mapGoogleFallbackBtn");
+    const mapStatus = $("#mapStatus");
+    const resourceList = $("#resourceList");
+
+    const regionData = {
+      "臺北市": [
+        "中正區","大同區","中山區","松山區","大安區","萬華區",
+        "信義區","士林區","北投區","內湖區","南港區","文山區"
+      ],
+      "新北市": [
+        "板橋區","三重區","中和區","永和區","新莊區","新店區",
+        "樹林區","鶯歌區","三峽區","淡水區","汐止區","瑞芳區",
+        "土城區","蘆洲區","五股區","泰山區","林口區","深坑區",
+        "石碇區","坪林區","三芝區","石門區","八里區","平溪區",
+        "雙溪區","貢寮區","金山區","萬里區","烏來區"
+      ],
+      "桃園市": [
+        "桃園區","中壢區","大溪區","楊梅區","蘆竹區","大園區",
+        "龜山區","八德區","龍潭區","平鎮區","新屋區","觀音區",
+        "復興區"
+      ],
+      "臺中市": [
+        "中區","東區","南區","西區","北區","北屯區","西屯區",
+        "南屯區","太平區","大里區","霧峰區","烏日區","豐原區",
+        "后里區","石岡區","東勢區","和平區","新社區","潭子區",
+        "大雅區","神岡區","大肚區","沙鹿區","龍井區","梧棲區",
+        "清水區","大甲區","外埔區","大安區"
+      ],
+      "臺南市": [
+        "中西區","東區","南區","北區","安平區","安南區","永康區",
+        "歸仁區","新化區","左鎮區","玉井區","楠西區","南化區",
+        "仁德區","關廟區","龍崎區","官田區","麻豆區","佳里區",
+        "西港區","七股區","將軍區","學甲區","北門區","新營區",
+        "後壁區","白河區","東山區","六甲區","下營區","柳營區",
+        "鹽水區","善化區","大內區","山上區","新市區","安定區"
+      ],
+      "高雄市": [
+        "新興區","前金區","苓雅區","鹽埕區","鼓山區","旗津區",
+        "前鎮區","三民區","楠梓區","小港區","左營區","仁武區",
+        "大社區","岡山區","路竹區","阿蓮區","田寮區","燕巢區",
+        "橋頭區","梓官區","彌陀區","永安區","湖內區","鳳山區",
+        "大寮區","林園區","鳥松區","大樹區","旗山區","美濃區",
+        "六龜區","甲仙區","杉林區","內門區","茂林區","桃源區",
+        "那瑪夏區"
+      ],
+      "基隆市": [
+        "仁愛區","信義區","中正區","中山區","安樂區","暖暖區","七堵區"
+      ],
+      "新竹市": [
+        "東區","北區","香山區"
+      ],
+      "新竹縣": [
+        "竹北市","竹東鎮","新埔鎮","關西鎮","湖口鄉","新豐鄉",
+        "芎林鄉","橫山鄉","北埔鄉","寶山鄉","峨眉鄉","尖石鄉","五峰鄉"
+      ],
+      "苗栗縣": [
+        "苗栗市","頭份市","竹南鎮","後龍鎮","通霄鎮","苑裡鎮",
+        "卓蘭鎮","造橋鄉","三灣鄉","南庄鄉","獅潭鄉","頭屋鄉",
+        "公館鄉","大湖鄉","泰安鄉","銅鑼鄉","三義鄉","西湖鄉"
+      ],
+      "彰化縣": [
+        "彰化市","員林市","鹿港鎮","和美鎮","北斗鎮","溪湖鎮",
+        "田中鎮","二林鎮","線西鄉","伸港鄉","福興鄉","秀水鄉",
+        "花壇鄉","芬園鄉","大村鄉","埔鹽鄉","埔心鄉","永靖鄉",
+        "社頭鄉","二水鄉","田尾鄉","埤頭鄉","芳苑鄉","大城鄉",
+        "竹塘鄉","溪州鄉"
+      ],
+      "南投縣": [
+        "南投市","埔里鎮","草屯鎮","竹山鎮","集集鎮","名間鄉",
+        "鹿谷鄉","中寮鄉","魚池鄉","國姓鄉","水里鄉","信義鄉","仁愛鄉"
+      ],
+      "雲林縣": [
+        "斗六市","斗南鎮","虎尾鎮","西螺鎮","土庫鎮","北港鎮",
+        "古坑鄉","大埤鄉","莿桐鄉","林內鄉","二崙鄉","崙背鄉",
+        "麥寮鄉","東勢鄉","褒忠鄉","臺西鄉","元長鄉","四湖鄉",
+        "口湖鄉","水林鄉"
+      ],
+      "嘉義市": [
+        "東區","西區"
+      ],
+      "嘉義縣": [
+        "太保市","朴子市","布袋鎮","大林鎮","民雄鄉","溪口鄉",
+        "新港鄉","六腳鄉","東石鄉","義竹鄉","鹿草鄉","水上鄉",
+        "中埔鄉","竹崎鄉","梅山鄉","番路鄉","大埔鄉","阿里山鄉"
+      ],
+      "屏東縣": [
+        "屏東市","潮州鎮","東港鎮","恆春鎮","萬丹鄉","長治鄉",
+        "麟洛鄉","九如鄉","里港鄉","鹽埔鄉","高樹鄉","萬巒鄉",
+        "內埔鄉","竹田鄉","新埤鄉","枋寮鄉","新園鄉","崁頂鄉",
+        "林邊鄉","南州鄉","佳冬鄉","琉球鄉","車城鄉","滿州鄉",
+        "枋山鄉","霧臺鄉","瑪家鄉","泰武鄉","來義鄉","春日鄉",
+        "獅子鄉","牡丹鄉","三地門鄉"
+      ],
+      "宜蘭縣": [
+        "宜蘭市","羅東鎮","蘇澳鎮","頭城鎮","礁溪鄉","壯圍鄉",
+        "員山鄉","冬山鄉","五結鄉","三星鄉","大同鄉","南澳鄉"
+      ],
+      "花蓮縣": [
+        "花蓮市","鳳林鎮","玉里鎮","新城鄉","吉安鄉","壽豐鄉",
+        "光復鄉","豐濱鄉","瑞穗鄉","富里鄉","秀林鄉","萬榮鄉","卓溪鄉"
+      ],
+      "臺東縣": [
+        "臺東市","成功鎮","關山鎮","卑南鄉","大武鄉","太麻里鄉",
+        "東河鄉","長濱鄉","鹿野鄉","池上鄉","綠島鄉","延平鄉",
+        "海端鄉","達仁鄉","金峰鄉","蘭嶼鄉"
+      ],
+      "澎湖縣": [
+        "馬公市","湖西鄉","白沙鄉","西嶼鄉","望安鄉","七美鄉"
+      ],
+      "金門縣": [
+        "金城鎮","金湖鎮","金沙鎮","金寧鄉","烈嶼鄉","烏坵鄉"
+      ],
+      "連江縣": [
+        "南竿鄉","北竿鄉","莒光鄉","東引鄉"
+      ]
+    };
+
+    Object.keys(regionData).forEach((region) => {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = region;
+      regionSelect.appendChild(option);
+    });
+
+    regionSelect.addEventListener("change", () => {
+      districtSelect.replaceChildren();
+
+      const region = regionSelect.value;
+      const districts = regionData[region] || [];
+
+      if (!region) {
+        districtSelect.disabled = true;
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "請先選擇縣市";
+        districtSelect.appendChild(option);
+        return;
+      }
+
+      districtSelect.disabled = false;
+
+      const first = document.createElement("option");
+      first.value = "";
+      first.textContent = "請選擇行政區";
+      districtSelect.appendChild(first);
+
+      districts.forEach((district) => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+      });
+    });
+
+    function initMap() {
+      if (mapInstance) return;
+
+      mapInstance = L.map("map", {
+        center: [23.7, 120.98],
+        zoom: 7,
+        zoomControl: true
+      });
+
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }
+      ).addTo(mapInstance);
+    }
+
+    initMap();
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const toRad = (deg) => deg * Math.PI / 180;
+      const R = 6371;
+
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+
+      return (
+        R *
+        2 *
+        Math.atan2(
+          Math.sqrt(a),
+          Math.sqrt(1 - a)
+        )
+      );
+    }
+
+    function buildPlaceText() {
+      const region = regionSelect.value.trim();
+      const district = districtSelect.value.trim();
+      const road = roadInput.value.trim();
+      const lane = laneInput.value.trim();
+      const number = numberInput.value.trim();
+
+      const parts = [
+        number,
+        lane,
+        road,
+        district,
+        region,
+        "台灣"
+      ].filter(Boolean);
+
+      return parts.join("");
+    }
+
+    async function geocodeWithNominatim(query) {
+      const url =
+        "https://nominatim.openstreetmap.org/search" +
+        `?format=jsonv2` +
+        `&limit=1` +
+        `&countrycodes=tw` +
+        `&accept-language=zh-TW` +
+        `&q=${encodeURIComponent(query)}`;
+
+      const response = await fetch(url, {
+        method: "GET"
+      });
+
+      if (!response.ok) {
+        throw new Error(`Nominatim HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data) || !data[0]) {
+        throw new Error("Nominatim 找不到位置");
+      }
+
+      return {
+        lat: Number(data[0].lat),
+        lon: Number(data[0].lon),
+        displayName:
+          data[0].display_name || query
+      };
+    }
+
+    async function geocodeWithPhoton(query) {
+      const url =
+        "https://photon.komoot.io/api/" +
+        `?q=${encodeURIComponent(query)}` +
+        `&limit=1` +
+        `&lang=zh`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Photon HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const feature = data?.features?.[0];
+
+      if (!feature?.geometry?.coordinates) {
+        throw new Error("Photon 找不到位置");
+      }
+
+      const [lon, lat] = feature.geometry.coordinates;
+      const props = feature.properties || {};
+
+      const label = [
+        props.name,
+        props.street,
+        props.district,
+        props.city,
+        props.country
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        lat: Number(lat),
+        lon: Number(lon),
+        displayName: label || query
+      };
+    }
+
+    async function geocodePlace(query) {
+      try {
+        return await geocodeWithNominatim(query);
+      } catch (firstError) {
+        console.warn("Nominatim 失敗，改用 Photon：", firstError);
+
+        return await geocodeWithPhoton(query);
+      }
+    }
+
+    async function overpassQuery(endpoint, query) {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body: `data=${encodeURIComponent(query)}`
+      });
+
+      if (!response.ok) {
+        throw new Error(`Overpass HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    }
+
+    async function findNearbyResources(lat, lon) {
+      const query = `
+[out:json][timeout:25];
+(
+  nwr(around:5000,${lat},${lon})["healthcare"~"psychiatry|psychotherapy|psychologist|counselling|mental_health|community_mental_health",i];
+  nwr(around:5000,${lat},${lon})["name"~"身心|精神|心理|諮商|心理治療|心理師",i];
+  nwr(around:5000,${lat},${lon})["amenity"~"hospital|clinic|doctors",i];
+);
+out center tags;
+`;
+
+      const endpoints = [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter"
+      ];
+
+      let lastError = null;
+
+      for (const endpoint of endpoints) {
+        try {
+          return await overpassQuery(
+            endpoint,
+            query
+          );
+        } catch (error) {
+          lastError = error;
+          console.warn(
+            `Overpass endpoint 失敗：${endpoint}`,
+            error
+          );
+        }
+      }
+
+      throw lastError || new Error("Overpass 搜尋失敗");
+    }
+
+    function getElementCoordinates(element) {
+      if (
+        Number.isFinite(element?.lat) &&
+        Number.isFinite(element?.lon)
+      ) {
+        return {
+          lat: Number(element.lat),
+          lon: Number(element.lon)
+        };
+      }
+
+      if (
+        Number.isFinite(element?.center?.lat) &&
+        Number.isFinite(element?.center?.lon)
+      ) {
+        return {
+          lat: Number(element.center.lat),
+          lon: Number(element.center.lon)
+        };
+      }
+
+      return null;
+    }
+
+    function classifyResource(tags) {
+      const healthcare =
+        String(tags?.healthcare || "").toLowerCase();
+
+      const name =
+        String(tags?.name || "");
+
+      if (
+        healthcare.includes("psychiat") ||
+        name.includes("精神")
+      ) {
+        return "身心科／精神醫療";
+      }
+
+      if (
+        healthcare.includes("psych") ||
+        name.includes("心理")
+        || name.includes("諮商")
+      ) {
+        return "心理支持／諮商";
+      }
+
+      if (
+        String(tags?.amenity || "") === "hospital"
+      ) {
+        return "醫院";
+      }
+
+      if (
+        String(tags?.amenity || "") === "clinic"
+      ) {
+        return "診所";
+      }
+
+      return "醫療／支持資源";
+    }
+
+    function normalizeResourceResults(data, centerLat, centerLon) {
+      const elements = Array.isArray(data?.elements)
+        ? data.elements
+        : [];
+
+      const seen = new Set();
+      const results = [];
+
+      for (const element of elements) {
+        const coords =
+          getElementCoordinates(element);
+
+        if (!coords) continue;
+
+        const tags = element.tags || {};
+
+        const name =
+          tags.name ||
+          tags["name:zh"] ||
+          "未命名支持資源";
+
+        const address =
+          tags["addr:full"] ||
+          [
+            tags["addr:city"],
+            tags["addr:district"],
+            tags["addr:street"],
+            tags["addr:housenumber"]
+          ]
+            .filter(Boolean)
+            .join("");
+
+        const key =
+          `${name}|${coords.lat.toFixed(5)}|${coords.lon.toFixed(5)}`;
+
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        const distance =
+          haversineKm(
+            centerLat,
+            centerLon,
+            coords.lat,
+            coords.lon
+          );
+
+        results.push({
+          id: element.id,
+          name,
+          address,
+          lat: coords.lat,
+          lon: coords.lon,
+          distance,
+          type: classifyResource(tags),
+          website: tags.website || tags["contact:website"] || "",
+          phone: tags.phone || tags["contact:phone"] || ""
+        });
+      }
+
+      return results
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 30);
+    }
+
+    function clearResourceMarkers() {
+      resourceMarkers.forEach((marker) => {
+        try {
+          mapInstance.removeLayer(marker);
+        } catch (_) {}
+      });
+
+      resourceMarkers = [];
+    }
+
+    function renderResourceList(resources, searchPoint) {
+      resourceList.replaceChildren();
+
+      if (!resources.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+
+        empty.textContent =
+          "目前公開地圖資料沒有找到明確的心理／身心支持資源。可以改用更完整的路名，或按「用 Google Maps 搜尋」再確認一次。";
+
+        resourceList.appendChild(empty);
+        return;
+      }
+
+      resources.forEach((resource, index) => {
+        const card = document.createElement("article");
+        card.className = "resource-card";
+
+        const title = document.createElement("div");
+        title.className = "resource-title";
+        title.textContent =
+          `${index + 1}. ${resource.name}`;
+
+        const meta = document.createElement("div");
+        meta.className = "resource-meta";
+
+        const distanceText =
+          Number.isFinite(resource.distance)
+            ? `約 ${resource.distance.toFixed(1)} 公里`
+            : "";
+
+        meta.textContent = [
+          resource.type,
+          distanceText,
+          resource.address
+        ]
+          .filter(Boolean)
+          .join(" · ");
+
+        const actions = document.createElement("div");
+        actions.className = "resource-actions";
+
+        const google = document.createElement("a");
+        google.target = "_blank";
+        google.rel = "noopener noreferrer";
+        google.href =
+          "https://www.google.com/maps/search/?api=1&query=" +
+          encodeURIComponent(
+            `${resource.name} ${resource.address || ""}`
+          );
+        google.textContent = "Google Maps";
+
+        actions.appendChild(google);
+
+        if (resource.phone) {
+          const phone = document.createElement("a");
+          phone.href =
+            `tel:${resource.phone.replace(/[^\d+]/g, "")}`;
+          phone.textContent = "電話";
+          actions.appendChild(phone);
+        }
+
+        if (resource.website) {
+          const website = document.createElement("a");
+          website.target = "_blank";
+          website.rel = "noopener noreferrer";
+          website.href = resource.website;
+          website.textContent = "網站";
+          actions.appendChild(website);
+        }
+
+        card.append(title, meta, actions);
+
+        card.addEventListener("click", () => {
+          mapInstance.setView(
+            [resource.lat, resource.lon],
+            15,
+            { animate: true }
+          );
+        });
+
+        resourceList.appendChild(card);
+      });
+    }
+
+    function placeSearchMarker(point, displayName) {
+      if (searchMarker) {
+        mapInstance.removeLayer(searchMarker);
+      }
+
+      if (searchCircle) {
+        mapInstance.removeLayer(searchCircle);
+      }
+
+      searchMarker = L.marker(
+        [point.lat, point.lon]
+      ).addTo(mapInstance);
+
+      searchMarker.bindPopup(
+        `<strong>搜尋位置</strong><br>${escapeHtml(
+          displayName
+        )}`
+      );
+
+      searchCircle = L.circle(
+        [point.lat, point.lon],
+        {
+          radius: 5000,
+          color: "#dda15e",
+          fillColor: "#dda15e",
+          fillOpacity: 0.08,
+          weight: 1
+        }
+      ).addTo(mapInstance);
+    }
+
+    /*
+      OpenStreetMap popup 中避免直接使用 innerHTML 顯示使用者輸入。
+    */
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function searchSupportResources() {
+      const region = regionSelect.value.trim();
+      const district = districtSelect.value.trim();
+
+      if (!region || !district) {
+        showToast("請先選擇縣市和行政區。");
+        return;
+      }
+
+      const query = buildPlaceText();
+
+      if (!query) {
+        showToast("請至少選擇縣市與行政區。");
+        return;
+      }
+
+      mapSearchBtn.disabled = true;
+      mapSearchBtn.textContent = "搜尋中…";
+
+      mapStatus.textContent =
+        "正在定位你手動選擇的區域並搜尋附近公開資料……";
+
+      resourceList.innerHTML =
+        `<div class="loading-state">正在搜尋附近支持資源，可能需要幾秒鐘。</div>`;
+
+      try {
+        const point = await geocodePlace(query);
+
+        if (
+          !Number.isFinite(point.lat) ||
+          !Number.isFinite(point.lon)
+        ) {
+          throw new Error("定位結果不是有效座標");
+        }
+
+        placeSearchMarker(
+          point,
+          point.displayName
+        );
+
+        clearResourceMarkers();
+
+        mapInstance.setView(
+          [point.lat, point.lon],
+          14,
+          { animate: true }
+        );
+
+        mapStatus.textContent =
+          `搜尋位置：${point.displayName} · 搜尋半徑約 5 公里`;
+
+        const data =
+          await findNearbyResources(
+            point.lat,
+            point.lon
+          );
+
+        const resources =
+          normalizeResourceResults(
+            data,
+            point.lat,
+            point.lon
+          );
+
+        resources.forEach((resource) => {
+          const marker = L.marker([
+            resource.lat,
+            resource.lon
+          ]).addTo(mapInstance);
+
+          const popupHtml = `
+            <div style="min-width:180px;">
+              <strong>${escapeHtml(resource.name)}</strong>
+              <div style="font-size:12px;margin-top:4px;">
+                ${escapeHtml(resource.type)}
+              </div>
+              <div style="font-size:11px;margin-top:4px;">
+                ${escapeHtml(resource.address || "地址資料不足")}
+              </div>
+            </div>
+          `;
+
+          marker.bindPopup(popupHtml);
+
+          resourceMarkers.push(marker);
+        });
+
+        renderResourceList(
+          resources,
+          point
+        );
+
+        if (resources.length) {
+          const bounds = L.latLngBounds([
+            [point.lat, point.lon],
+            ...resources.map((resource) => [
+              resource.lat,
+              resource.lon
+            ])
+          ]);
+
+          mapInstance.fitBounds(
+            bounds.pad(0.12)
+          );
+        }
+
+        if (!resources.length) {
+          mapStatus.textContent +=
+            " · 暫時沒有明確結果";
+        }
+      } catch (error) {
+        console.error("地圖搜尋失敗：", error);
+
+        mapStatus.textContent =
+          "這次搜尋沒有成功完成。";
+
+        resourceList.innerHTML = `
+          <div class="empty-state">
+            地圖服務目前可能忙碌或暫時無法連線。
+            可以再試一次，或使用 Google Maps 搜尋。
+          </div>
+        `;
+
+        showToast(
+          "地圖搜尋暫時失敗，請稍後再試。",
+          3800
+        );
+      } finally {
+        mapSearchBtn.disabled = false;
+        mapSearchBtn.textContent =
+          "🔎 搜尋附近支持資源";
+      }
+    }
+
+    mapSearchBtn.addEventListener(
+      "click",
+      searchSupportResources
+    );
+
+    mapGoogleFallbackBtn.addEventListener(
+      "click",
+      () => {
+        const query =
+          buildPlaceText() ||
+          "台灣 心理諮商";
+
+        const url =
+          "https://www.google.com/maps/search/?api=1&query=" +
+          encodeURIComponent(
+            `${query} 心理諮商`
+          );
+
+        window.open(
+          url,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      }
+    );
+
+    /* =========================================================
+       日記
+       ========================================================= */
+
+    let diaryData = {};
+    let diarySelectedDate = formatDateKey(new Date());
+    let diaryMonthCursor = new Date();
+    let selectedDiaryColor = "#4a4036";
+    let brushSize = 4;
+
+    const calendarGrid = $("#calendarGrid");
+    const calendarTitle = $("#calendarTitle");
+    const selectedDateText = $("#selectedDateText");
+    const diaryText = $("#diaryText");
+    const customColorInput = $("#customColorInput");
+    const customColorPreview = $("#customColorPreview");
+    const brushSizeInput = $("#brushSize");
+    const brushSizeValue = $("#brushSizeValue");
+    const drawingCanvas = $("#drawingCanvas");
+    const drawingContext = drawingCanvas.getContext("2d", {
+      alpha: false
+    });
+
+    let drawing = false;
+
+    function formatDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+      const day = String(
+        date.getDate()
+      ).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseDateKey(key) {
+      const [year, month, day] =
+        key.split("-").map(Number);
+
+      return new Date(
+        year,
+        month - 1,
+        day
+      );
+    }
+
+    function diaryStorageKey(uid) {
+      return `diaryData:${uid}`;
+    }
+
+    function loadDiaryData() {
+      if (!currentUser) {
+        diaryData = {};
+        return;
+      }
+
+      const raw =
+        localGet(
+          diaryStorageKey(currentUser.uid),
+          "{}"
+        );
+
+      const parsed =
+        safeJsonParse(raw, {});
+
+      diaryData =
+        parsed &&
+        typeof parsed === "object" &&
+        !Array.isArray(parsed)
+          ? parsed
+          : {};
+    }
+
+    function saveDiaryDataToStorage() {
+      if (!currentUser) {
+        showToast("目前還沒有登入帳號。");
+        return false;
+      }
+
+      return localSet(
+        diaryStorageKey(currentUser.uid),
+        JSON.stringify(diaryData)
+      );
+    }
+
+    function renderCalendar() {
+      const year =
+        diaryMonthCursor.getFullYear();
+
+      const month =
+        diaryMonthCursor.getMonth();
+
+      calendarTitle.textContent =
+        `${year} 年 ${month + 1} 月`;
+
+      calendarGrid.replaceChildren();
+
+      const firstDay =
+        new Date(
+          year,
+          month,
+          1
+        ).getDay();
+
+      const daysInMonth =
+        new Date(
+          year,
+          month + 1,
+          0
+        ).getDate();
+
+      const prevMonthDays =
+        new Date(
+          year,
+          month,
+          0
+        ).getDate();
+
+      for (let index = 0; index < 42; index++) {
+        let dayNumber;
+        let cellYear = year;
+        let cellMonth = month;
+        let isOtherMonth = false;
+
+        if (index < firstDay) {
+          dayNumber =
+            prevMonthDays -
+            firstDay +
+            index +
+            1;
+
+          cellMonth -= 1;
+
+          if (cellMonth < 0) {
+            cellMonth = 11;
+            cellYear -= 1;
+          }
+
+          isOtherMonth = true;
+        } else if (
+          index >= firstDay + daysInMonth
+        ) {
+          dayNumber =
+            index -
+            firstDay -
+            daysInMonth +
+            1;
+
+          cellMonth += 1;
+
+          if (cellMonth > 11) {
+            cellMonth = 0;
+            cellYear += 1;
+          }
+
+          isOtherMonth = true;
+        } else {
+          dayNumber =
+            index - firstDay + 1;
+        }
+
+        const dateKey =
+          `${cellYear}-${String(
+            cellMonth + 1
+          ).padStart(2, "0")}-${String(
+            dayNumber
+          ).padStart(2, "0")}`;
+
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.className = "day-btn";
+
+        if (isOtherMonth) {
+          button.classList.add("other-month");
+        }
+
+        if (
+          dateKey === diarySelectedDate
+        ) {
+          button.classList.add("selected");
+        }
+
+        const todayKey =
+          formatDateKey(new Date());
+
+        if (dateKey === todayKey) {
+          button.classList.add("today");
+        }
+
+        button.textContent = dayNumber;
+
+        if (diaryData[dateKey]) {
+          const dot =
+            document.createElement("span");
+
+          dot.className = "entry-dot";
+
+          button.appendChild(dot);
+        }
+
+        button.addEventListener(
+          "click",
+          () => {
+            saveCurrentDiarySilently();
+
+            diarySelectedDate =
+              dateKey;
+
+            diaryMonthCursor =
+              new Date(
+                cellYear,
+                cellMonth,
+                1
+              );
+
+            renderCalendar();
+            loadSelectedDiary();
+          }
+        );
+
+        calendarGrid.appendChild(button);
+      }
+
+      const selectedDate =
+        parseDateKey(
+          diarySelectedDate
+        );
+
+      selectedDateText.textContent =
+        `目前選擇：${selectedDate.getFullYear()} 年 ${
+          selectedDate.getMonth() + 1
+        } 月 ${selectedDate.getDate()} 日`;
+    }
+
+    function getSelectedMood() {
+      const checked =
+        $('input[name="mood"]:checked');
+
+      return checked?.value || "";
+    }
+
+    function setSelectedMood(value) {
+      $$('input[name="mood"]').forEach(
+        (input) => {
+          input.checked =
+            input.value === value;
+        }
+      );
+    }
+
+    function clearMood() {
+      $$('input[name="mood"]').forEach(
+        (input) => {
+          input.checked = false;
+        }
+      );
+    }
+
+    function drawImageOnCanvas(dataUrl) {
+      clearCanvas(false);
+
+      if (!dataUrl) return;
+
+      const image = new Image();
+
+      image.onload = () => {
+        const rect =
+          drawingCanvas.getBoundingClientRect();
+
+        drawingContext.drawImage(
+          image,
+          0,
+          0,
+          rect.width,
+          rect.height
+        );
+      };
+
+      image.onerror = () => {
+        console.warn("日記畫畫圖片讀取失敗");
+      };
+
+      image.src = dataUrl;
+    }
+
+    function getDrawingDataUrl() {
+      try {
+        return drawingCanvas.toDataURL(
+          "image/jpeg",
+          0.72
+        );
+      } catch (error) {
+        console.warn(
+          "畫布轉圖片失敗：",
+          error
+        );
+
+        showToast(
+          "畫布圖片太大，這次沒有保存畫畫。",
+          3500
+        );
+
+        return "";
+      }
+    }
+
+    function loadSelectedDiary() {
+      const entry =
+        diaryData[diarySelectedDate];
+
+      if (!entry) {
+        clearMood();
+        diaryText.value = "";
+        clearCanvas(false);
+        return;
+      }
+
+      setSelectedMood(
+        entry.mood || ""
+      );
+
+      diaryText.value =
+        entry.text || "";
+
+      setTimeout(() => {
+        resizeDrawingCanvas(false);
+        drawImageOnCanvas(
+          entry.drawing || ""
+        );
+      }, 30);
+    }
+
+    function saveCurrentDiarySilently() {
+      if (!currentUser) return;
+
+      const mood =
+        getSelectedMood();
+
+      const text =
+        diaryText.value.trim();
+
+      const drawing =
+        getDrawingDataUrl();
+
+      if (!mood && !text && !drawing) {
+        return;
+      }
+
+      diaryData[diarySelectedDate] = {
+        mood,
+        text,
+        drawing,
+        updatedAt:
+          new Date().toISOString()
+      };
+
+      saveDiaryDataToStorage();
+    }
+
+    function saveDiaryEntry(showMessage = true) {
+      if (!currentUser) {
+        showToast("請先等待登入完成。");
+        return;
+      }
+
+      const mood =
+        getSelectedMood();
+
+      const text =
+        diaryText.value.trim();
+
+      const drawing =
+        getDrawingDataUrl();
+
+      if (!mood && !text && !drawing) {
+        delete diaryData[diarySelectedDate];
+
+        saveDiaryDataToStorage();
+        renderCalendar();
+
+        if (showMessage) {
+          showToast(
+            "這一天目前是空白的，所以沒有建立紀錄。"
+          );
+        }
+
+        return;
+      }
+
+      diaryData[diarySelectedDate] = {
+        mood,
+        text,
+        drawing,
+        updatedAt:
+          new Date().toISOString()
+      };
+
+      const saved =
+        saveDiaryDataToStorage();
+
+      if (saved) {
+        renderCalendar();
+
+        if (showMessage) {
+          showToast(
+            `已保存 ${diarySelectedDate} 的日記 🌷`
+          );
+        }
+      }
+    }
+
+    function deleteDiaryEntry() {
+      if (!currentUser) return;
+
+      if (!diaryData[diarySelectedDate]) {
+        showToast("這一天本來就沒有紀錄。");
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          "確定要刪除這一天的日記、心情與畫畫嗎？"
+        );
+
+      if (!confirmed) return;
+
+      delete diaryData[diarySelectedDate];
+
+      saveDiaryDataToStorage();
+
+      clearMood();
+      diaryText.value = "";
+      clearCanvas(false);
+
+      renderCalendar();
+
+      showToast("這一天的日記已刪除。");
+    }
+
+    function clearCanvas(showMessage = true) {
+      const rect =
+        drawingCanvas.getBoundingClientRect();
+
+      drawingContext.save();
+      drawingContext.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      );
+      drawingContext.fillStyle =
+        "#fffdf9";
+      drawingContext.fillRect(
+        0,
+        0,
+        drawingCanvas.width,
+        drawingCanvas.height
+      );
+      drawingContext.restore();
+
+      setupDrawingContext();
+
+      if (showMessage) {
+        showToast("畫布已清除。");
+      }
+    }
+
+    function setupDrawingContext() {
+      drawingContext.lineCap = "round";
+      drawingContext.lineJoin = "round";
+      drawingContext.strokeStyle =
+        selectedDiaryColor;
+      drawingContext.lineWidth =
+        brushSize;
+    }
+
+    function resizeDrawingCanvas(preserve = true) {
+      const rect =
+        drawingCanvas.getBoundingClientRect();
+
+      if (rect.width <= 0 || rect.height <= 0) {
+        return;
+      }
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio || 1,
+          2
+        );
+
+      let snapshot = null;
+
+      if (
+        preserve &&
+        drawingCanvas.width > 0 &&
+        drawingCanvas.height > 0
+      ) {
+        snapshot =
+          document.createElement("canvas");
+
+        snapshot.width =
+          drawingCanvas.width;
+
+        snapshot.height =
+          drawingCanvas.height;
+
+        const snapshotContext =
+          snapshot.getContext("2d");
+
+        snapshotContext.drawImage(
+          drawingCanvas,
+          0,
+          0
+        );
+      }
+
+      drawingCanvas.width =
+        Math.round(rect.width * dpr);
+
+      drawingCanvas.height =
+        Math.round(rect.height * dpr);
+
+      drawingCanvas.style.width =
+        `${rect.width}px`;
+
+      drawingCanvas.style.height =
+        `${rect.height}px`;
+
+      drawingContext.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      drawingContext.fillStyle =
+        "#fffdf9";
+
+      drawingContext.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+      setupDrawingContext();
+
+      if (snapshot) {
+        drawingContext.drawImage(
+          snapshot,
+          0,
+          0,
+          snapshot.width,
+          snapshot.height,
+          0,
+          0,
+          rect.width,
+          rect.height
+        );
+      }
+    }
+
+    function getCanvasPoint(event) {
+      const rect =
+        drawingCanvas.getBoundingClientRect();
+
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    drawingCanvas.addEventListener(
+      "pointerdown",
+      (event) => {
+        event.preventDefault();
+
+        drawing = true;
+
+        drawingCanvas.setPointerCapture(
+          event.pointerId
+        );
+
+        const point =
+          getCanvasPoint(event);
+
+        drawingContext.beginPath();
+        drawingContext.moveTo(
+          point.x,
+          point.y
+        );
+      }
+    );
+
+    drawingCanvas.addEventListener(
+      "pointermove",
+      (event) => {
+        if (!drawing) return;
+
+        event.preventDefault();
+
+        const point =
+          getCanvasPoint(event);
+
+        drawingContext.lineTo(
+          point.x,
+          point.y
+        );
+
+        drawingContext.stroke();
+      }
+    );
+
+    function finishDrawing(event) {
+      if (!drawing) return;
+
+      drawing = false;
+
+      try {
+        drawingCanvas.releasePointerCapture(
+          event.pointerId
+        );
+      } catch (_) {}
+
+      drawingContext.closePath();
+    }
+
+    drawingCanvas.addEventListener(
+      "pointerup",
+      finishDrawing
+    );
+
+    drawingCanvas.addEventListener(
+      "pointercancel",
+      finishDrawing
+    );
+
+    drawingCanvas.addEventListener(
+      "pointerleave",
+      (event) => {
+        if (
+          drawing &&
+          event.buttons === 0
+        ) {
+          finishDrawing(event);
+        }
+      }
+    );
+
+    $$("#builtInPalette .swatch").forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            selectedDiaryColor =
+              button.dataset.color;
+
+            $$("#builtInPalette .swatch").forEach(
+              (item) => {
+                item.classList.toggle(
+                  "active",
+                  item === button
+                );
+              }
+            );
+
+            setupDrawingContext();
+
+            customColorPreview.style.background =
+              customColorInput.value;
+          }
+        );
+      }
+    );
+
+    customColorInput.addEventListener(
+      "input",
+      () => {
+        customColorPreview.style.background =
+          customColorInput.value;
+      }
+    );
+
+    $("#useCustomColorBtn").addEventListener(
+      "click",
+      () => {
+        selectedDiaryColor =
+          customColorInput.value;
+
+        $$("#builtInPalette .swatch").forEach(
+          (item) => item.classList.remove("active")
+        );
+
+        setupDrawingContext();
+
+        showToast(
+          `已套用自訂顏色 ${selectedDiaryColor} 🎨`
+        );
+      }
+    );
+
+    brushSizeInput.addEventListener(
+      "input",
+      () => {
+        brushSize =
+          Number(brushSizeInput.value);
+
+        brushSizeValue.textContent =
+          `${brushSize} px`;
+
+        setupDrawingContext();
+      }
+    );
+
+    $("#clearCanvasBtn").addEventListener(
+      "click",
+      () => clearCanvas(true)
+    );
+
+    $("#saveDrawingBtn").addEventListener(
+      "click",
+      () => {
+        if (!currentUser) {
+          showToast("請先完成登入。");
+          return;
+        }
+
+        const drawing =
+          getDrawingDataUrl();
+
+        diaryData[diarySelectedDate] = {
+          ...(diaryData[diarySelectedDate] || {}),
+          mood: getSelectedMood(),
+          text: diaryText.value.trim(),
+          drawing,
+          updatedAt:
+            new Date().toISOString()
+        };
+
+        if (
+          saveDiaryDataToStorage()
+        ) {
+          renderCalendar();
+          showToast("畫畫已保存 🎨");
+        }
+      }
+    );
+
+    $("#saveDiaryBtn").addEventListener(
+      "click",
+      () => saveDiaryEntry(true)
+    );
+
+    $("#deleteDiaryBtn").addEventListener(
+      "click",
+      deleteDiaryEntry
+    );
+
+    $("#prevMonthBtn").addEventListener(
+      "click",
+      () => {
+        saveCurrentDiarySilently();
+
+        diaryMonthCursor =
+          new Date(
+            diaryMonthCursor.getFullYear(),
+            diaryMonthCursor.getMonth() - 1,
+            1
+          );
+
+        diarySelectedDate =
+          formatDateKey(
+            diaryMonthCursor
+          );
+
+        renderCalendar();
+        loadSelectedDiary();
+      }
+    );
+
+    $("#nextMonthBtn").addEventListener(
+      "click",
+      () => {
+        saveCurrentDiarySilently();
+
+        diaryMonthCursor =
+          new Date(
+            diaryMonthCursor.getFullYear(),
+            diaryMonthCursor.getMonth() + 1,
+            1
+          );
+
+        diarySelectedDate =
+          formatDateKey(
+            diaryMonthCursor
+          );
+
+        renderCalendar();
+        loadSelectedDiary();
+      }
+    );
+
+    window.addEventListener(
+      "resize",
+      debounce(() => {
+        resizeDrawingCanvas(true);
+
+        if (mapInstance) {
+          mapInstance.invalidateSize();
+        }
+      }, 180)
+    );
+
+    function initializeDiaryForUser() {
+      loadDiaryData();
+
+      diaryMonthCursor =
+        parseDateKey(
+          diarySelectedDate
+        );
+
+      renderCalendar();
+
+      setTimeout(() => {
+        resizeDrawingCanvas(false);
+        loadSelectedDiary();
+      }, 80);
+    }
+
+    /* =========================================================
+       使用者登入後初始化個人資料功能
+       ========================================================= */
+
+    let initializedUserId = null;
+
+    function initializeUserFeatures(user) {
+      if (!user) return;
+
+      if (initializedUserId === user.uid) {
+        return;
+      }
+
+      initializedUserId = user.uid;
+
+      createChatForCurrentUser();
+      renderChatHistory();
+
+      initializeDiaryForUser();
+
+      aiStatusText.textContent =
+        aiModel
+          ? "可以開始聊天了。"
+          : "AI 目前沒有成功啟用。";
+
+      autoResizeChatInput();
+    }
+
+    /* =========================================================
+       初始狀態
+       ========================================================= */
+
+    renderChatHistory();
+
+    setTimeout(() => {
+      resizeDrawingCanvas(false);
+      clearCanvas(false);
+    }, 120);
+  </script>
+</body>
+</html>
